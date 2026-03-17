@@ -1,9 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../screens/auth/login_screen.dart';
+import '../screens/auth/register_screen.dart';
+import '../screens/home/home_screen.dart';
+import '../screens/emergency/request_screen.dart';
+import '../screens/emergency/live_tracking_screen.dart';
+import '../screens/emergency/first_aid_screen.dart';
+import '../screens/responder/responder_dashboard.dart';
+import '../screens/responder/responder_request_detail.dart';
+import '../screens/admin/admin_dashboard.dart';
+import '../screens/admin/assign_responder_screen.dart';
+import '../screens/emergency/emergency_history_screen.dart';
+import '../screens/home/notifications_screen.dart';
+import '../screens/profile/profile_screen.dart';
+import '../screens/settings/settings_screen.dart';
+import '../models/emergency_model.dart';
 
 /// Route constants for the ResQNow application.
-/// Using a dedicated class for route names avoids hardcoded strings
-/// and makes refactoring easier.
 class AppRouteNames {
   AppRouteNames._();
 
@@ -14,6 +27,7 @@ class AppRouteNames {
   static const String emergencyRequest = 'emergency_request';
   static const String emergencyTracking = 'emergency_tracking';
   static const String emergencyHistory = 'emergency_history';
+  static const String firstAid = 'first_aid';
   static const String responderDashboard = 'responder_dashboard';
   static const String requestDetail = 'request_detail';
   static const String adminDashboard = 'admin_dashboard';
@@ -21,64 +35,66 @@ class AppRouteNames {
   static const String profile = 'profile';
   static const String settings = 'settings';
   static const String notifications = 'notifications';
-  static const String onboarding = 'onboarding';
 }
 
-/// Central routing configuration for ResQNow.
-/// This uses the `go_router` package for robust, parameter-aware navigation.
 class AppRouter {
   AppRouter._();
 
-  // Root Navigator Key for global access if needed (e.g., showing dialogs)
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
   static final GoRouter router = GoRouter(
-    initialLocation: '/',
+    initialLocation: '/login', // Start at login for now
     navigatorKey: _rootNavigatorKey,
-    debugLogDiagnostics: true,
+    debugLogDiagnostics: false,
     routes: [
-      // Splash Screen
-      GoRoute(
-        path: '/',
-        name: AppRouteNames.splash,
-        builder: (context, state) => const _PlaceholderScreen(title: 'Splash Screen'),
-      ),
-
       // Auth Routes
       GoRoute(
         path: '/login',
         name: AppRouteNames.login,
-        builder: (context, state) => const _PlaceholderScreen(title: 'Login Screen'),
+        builder: (context, state) => const LoginScreen(),
       ),
       GoRoute(
         path: '/register',
         name: AppRouteNames.register,
-        builder: (context, state) => const _PlaceholderScreen(title: 'Register Screen'),
+        builder: (context, state) => const RegisterScreen(),
       ),
 
       // Main Citizen Flow
       GoRoute(
         path: '/home',
         name: AppRouteNames.home,
-        builder: (context, state) => const _PlaceholderScreen(title: 'Home Screen'),
+        builder: (context, state) => const HomeScreen(),
         routes: [
           GoRoute(
             path: 'request',
             name: AppRouteNames.emergencyRequest,
-            builder: (context, state) => const _PlaceholderScreen(title: 'Emergency Request'),
+            builder: (context, state) {
+              final type = state.extra as EmergencyType?;
+              return RequestScreen(initialType: type);
+            },
           ),
           GoRoute(
             path: 'tracking/:emergencyId',
             name: AppRouteNames.emergencyTracking,
             builder: (context, state) {
               final id = state.pathParameters['emergencyId'] ?? '';
-              return _PlaceholderScreen(title: 'Tracking Emergency: $id');
+              return LiveTrackingScreen(emergencyId: id);
             },
+          ),
+          GoRoute(
+            path: 'first-aid',
+            name: AppRouteNames.firstAid,
+            builder: (context, state) => const FirstAidScreen(),
           ),
           GoRoute(
             path: 'history',
             name: AppRouteNames.emergencyHistory,
-            builder: (context, state) => const _PlaceholderScreen(title: 'Emergency History'),
+            builder: (context, state) => const EmergencyHistoryScreen(),
+          ),
+          GoRoute(
+            path: 'notifications',
+            name: AppRouteNames.notifications,
+            builder: (context, state) => const NotificationsScreen(),
           ),
         ],
       ),
@@ -87,14 +103,14 @@ class AppRouter {
       GoRoute(
         path: '/responder',
         name: AppRouteNames.responderDashboard,
-        builder: (context, state) => const _PlaceholderScreen(title: 'Responder Dashboard'),
+        builder: (context, state) => const ResponderDashboard(),
         routes: [
           GoRoute(
             path: 'detail/:requestId',
             name: AppRouteNames.requestDetail,
             builder: (context, state) {
               final id = state.pathParameters['requestId'] ?? '';
-              return _PlaceholderScreen(title: 'Request Details: $id');
+              return ResponderRequestDetail(requestId: id);
             },
           ),
         ],
@@ -104,74 +120,33 @@ class AppRouter {
       GoRoute(
         path: '/admin',
         name: AppRouteNames.adminDashboard,
-        builder: (context, state) => const _PlaceholderScreen(title: 'Admin Dashboard'),
+        builder: (context, state) => const AdminDashboard(),
         routes: [
           GoRoute(
             path: 'assign/:requestId',
             name: AppRouteNames.assignResponder,
             builder: (context, state) {
               final id = state.pathParameters['requestId'] ?? '';
-              return _PlaceholderScreen(title: 'Assign Responder to: $id');
+              return AssignResponderScreen(requestId: id);
             },
           ),
         ],
       ),
 
-      // User & System Routes
+      // System Routes (Minimal placeholders for real feel)
       GoRoute(
         path: '/profile',
         name: AppRouteNames.profile,
-        builder: (context, state) => const _PlaceholderScreen(title: 'Profile'),
+        builder: (context, state) => const ProfileScreen(),
       ),
       GoRoute(
         path: '/settings',
         name: AppRouteNames.settings,
-        builder: (context, state) => const _PlaceholderScreen(title: 'Settings'),
-      ),
-      GoRoute(
-        path: '/notifications',
-        name: AppRouteNames.notifications,
-        builder: (context, state) => const _PlaceholderScreen(title: 'Notifications'),
-      ),
-      GoRoute(
-        path: '/onboarding',
-        name: AppRouteNames.onboarding,
-        builder: (context, state) => const _PlaceholderScreen(title: 'Onboarding'),
+        builder: (context, state) => const SettingsScreen(),
       ),
     ],
-    
-    // Global redirects or error handling could be added here
-    errorBuilder: (context, state) => const _PlaceholderScreen(title: 'Error: Page Not Found'),
+    errorBuilder: (context, state) => const Scaffold(
+      body: Center(child: Text('Error: Page Not Found')),
+    ),
   );
-}
-
-/// Navigation extension for cleaner context-based navigation calls.
-/// Use like: context.pushTo(AppRouteNames.home)
-extension AppNavigation on BuildContext {
-  void pushTo(String name, {Map<String, String> params = const {}, Object? extra}) {
-    pushNamed(name, pathParameters: params, extra: extra);
-  }
-
-  void goTO(String name, {Map<String, String> params = const {}, Object? extra}) {
-    goNamed(name, pathParameters: params, extra: extra);
-  }
-
-  void replaceWith(String name, {Map<String, String> params = const {}, Object? extra}) {
-    pushReplacementNamed(name, pathParameters: params, extra: extra);
-  }
-
-  void clearStackAndGo(String name) {
-    while (canPop()) {
-      pop();
-    }
-    goNamed(name);
-  }
-}
-
-/// Private placeholder to demonstrate builder connection without actual UI code.
-class _PlaceholderScreen extends StatelessWidget {
-  final String title;
-  const _PlaceholderScreen({required this.title});
-  @override
-  Widget build(BuildContext context) => Scaffold(body: Center(child: Text(title)));
 }

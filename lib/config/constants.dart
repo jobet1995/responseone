@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 /// Central constants for the ResQNow Emergency Response App.
-/// This file contains all non-sensitive configuration, collection names,
+/// This file contains all non-sensitive configuration, 
 /// status codes, and other values used throughout the application.
 class AppConstants {
   AppConstants._();
@@ -19,18 +19,6 @@ class AppConstants {
   static const int maxRetries = 3;
   static const Duration timeoutDuration = Duration(seconds: 30);
   static const Duration splashDelay = Duration(seconds: 2);
-}
-
-/// Firestore collection names for organization and consistency.
-class FirestoreCollections {
-  FirestoreCollections._();
-
-  static const String users = 'users';
-  static const String emergencies = 'emergencies';
-  static const String responders = 'responders';
-  static const String notifications = 'notifications';
-  static const String activityLogs = 'activity_logs';
-  static const String systemConfig = 'system_config';
 }
 
 /// Defined user roles within the ResQNow ecosystem.
@@ -73,7 +61,7 @@ class NotificationTypes {
   static const String statusUpdate = 'status_update';
 }
 
-/// REST API Endpoints (if using a dedicated backend service).
+/// REST API Endpoints.
 class ApiEndpoints {
   ApiEndpoints._();
 

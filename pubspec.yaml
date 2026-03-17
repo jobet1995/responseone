@@ -45,11 +45,6 @@ dependencies:
   flutter_local_notifications: ^21.0.0
   connectivity_plus: ^7.0.0
   internet_connection_checker: ^1.0.0+1
-  firebase_core: ^4.5.0
-  firebase_auth: ^6.2.0
-  cloud_firestore: ^6.1.3
-  firebase_messaging: ^16.1.2
-  firebase_storage: ^13.1.0
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   shared_preferences: ^2.5.4
@@ -58,6 +53,7 @@ dependencies:
   flutter_polyline_points: ^3.1.0
   fl_chart: ^1.2.0
   lottie: ^3.3.2
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:

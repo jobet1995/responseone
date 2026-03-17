@@ -1,0 +1,72 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../services/emergency_service.dart';
+import '../models/emergency_model.dart';
+import 'user_provider.dart';
+
+/// Provider for the [EmergencyService] instance.
+final emergencyServiceProvider = Provider<EmergencyService>((ref) {
+  return EmergencyService.instance;
+});
+
+/// Notifier to manage active and historical emergency reports.
+class EmergencyNotifier extends Notifier<AsyncValue<List<EmergencyModel>>> {
+  late final EmergencyService _emergencyService;
+  late final String? _userId;
+
+  @override
+  AsyncValue<List<EmergencyModel>> build() {
+    _emergencyService = ref.watch(emergencyServiceProvider);
+    _userId = ref.watch(currentUserProvider).value?.id;
+    
+    if (_userId != null) {
+      // Small delay to avoid side-effects during build
+      Future.microtask(() => fetchHistory());
+    }
+    
+    return const AsyncValue.loading();
+  }
+
+  /// Fetches the emergency history for the current user.
+  Future<void> fetchHistory() async {
+    if (_userId == null) return;
+    state = const AsyncValue.loading();
+    try {
+      final history = await _emergencyService.getEmergencyHistory(_userId);
+      state = AsyncValue.data(history);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  /// Reports a new emergency and adds it to the current list.
+  Future<bool> reportEmergency(Map<String, dynamic> data) async {
+    try {
+      final newEmergency = await _emergencyService.createEmergency(data);
+      if (newEmergency != null) {
+        state.whenData((list) {
+          state = AsyncValue.data([newEmergency, ...list]);
+        });
+        return true;
+      }
+    } catch (e) {
+      // Handle error
+    }
+    return false;
+  }
+
+  /// Updates the status of an emergency in the local state.
+  void updateLocalStatus(String id, EmergencyStatus status) {
+    state.whenData((list) {
+      final updatedList = list.map((e) {
+        return e.id == id ? e.copyWith(status: status) : e;
+      }).toList();
+      state = AsyncValue.data(updatedList);
+    });
+  }
+}
+
+/// Provider to access the list of emergencies for the current user.
+final emergencyHistoryProvider =
+    NotifierProvider<EmergencyNotifier, AsyncValue<List<EmergencyModel>>>(
+  EmergencyNotifier.new,
+);

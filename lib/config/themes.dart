@@ -35,11 +35,11 @@ class AppTheme {
         primary: primaryRed,
         secondary: secondaryBlue,
         surface: surfaceLight,
-        background: backgroundLight,
         error: errorColor,
         onPrimary: textOnPrimary,
         onSurface: textPrimary,
       ),
+      scaffoldBackgroundColor: backgroundLight,
       
       // --- Typography ---
       textTheme: _textTheme,
