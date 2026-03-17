@@ -13,7 +13,11 @@ import '../screens/admin/assign_responder_screen.dart';
 import '../screens/emergency/emergency_history_screen.dart';
 import '../screens/home/notifications_screen.dart';
 import '../screens/profile/profile_screen.dart';
+import '../screens/profile/edit_profile_screen.dart';
+import '../screens/profile/emergency_contacts_screen.dart';
 import '../screens/settings/settings_screen.dart';
+import '../screens/settings/about_screen.dart';
+import '../screens/splash_screen.dart';
 import '../models/emergency_model.dart';
 
 /// Route constants for the ResQNow application.
@@ -33,7 +37,10 @@ class AppRouteNames {
   static const String adminDashboard = 'admin_dashboard';
   static const String assignResponder = 'assign_responder';
   static const String profile = 'profile';
+  static const String editProfile = 'edit_profile';
+  static const String emergencyContacts = 'emergency_contacts';
   static const String settings = 'settings';
+  static const String about = 'about';
   static const String notifications = 'notifications';
 }
 
@@ -43,10 +50,15 @@ class AppRouter {
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
   static final GoRouter router = GoRouter(
-    initialLocation: '/login', // Start at login for now
+    initialLocation: '/', // Start at splash
     navigatorKey: _rootNavigatorKey,
     debugLogDiagnostics: false,
     routes: [
+      GoRoute(
+        path: '/',
+        name: AppRouteNames.splash,
+        builder: (context, state) => const SplashScreen(),
+      ),
       // Auth Routes
       GoRoute(
         path: '/login',
@@ -138,11 +150,30 @@ class AppRouter {
         path: '/profile',
         name: AppRouteNames.profile,
         builder: (context, state) => const ProfileScreen(),
+        routes: [
+          GoRoute(
+            path: 'edit',
+            name: AppRouteNames.editProfile,
+            builder: (context, state) => const EditProfileScreen(),
+          ),
+          GoRoute(
+            path: 'contacts',
+            name: AppRouteNames.emergencyContacts,
+            builder: (context, state) => const EmergencyContactsScreen(),
+          ),
+        ],
       ),
       GoRoute(
         path: '/settings',
         name: AppRouteNames.settings,
         builder: (context, state) => const SettingsScreen(),
+        routes: [
+          GoRoute(
+            path: 'about',
+            name: AppRouteNames.about,
+            builder: (context, state) => const AboutScreen(),
+          ),
+        ],
       ),
     ],
     errorBuilder: (context, state) => const Scaffold(

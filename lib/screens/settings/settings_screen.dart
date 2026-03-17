@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../config/themes.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -49,6 +50,7 @@ class SettingsScreen extends StatelessWidget {
             Icons.info_outline,
             'Version',
             'ResQNow v1.0.0+1',
+            onTap: () => context.push('/settings/about'),
           ),
           _buildSettingsTile(
             context,

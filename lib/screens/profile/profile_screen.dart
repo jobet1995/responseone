@@ -18,9 +18,7 @@ class ProfileScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined),
-            onPressed: () {
-              // Edit profile logic
-            },
+            onPressed: () => context.push('/profile/edit'),
           ),
         ],
       ),
@@ -86,6 +84,13 @@ class ProfileScreen extends ConsumerWidget {
                 _buildInfoCard(context, [
                   _buildInfoTile(context, Icons.phone_outlined, 'Phone', user.phoneNumber),
                   _buildInfoTile(context, Icons.location_on_outlined, 'Address', 'Manila, Philippines'),
+                  _buildInfoTile(
+                    context,
+                    Icons.contact_phone_outlined,
+                    'Emergency Contacts',
+                    '2 contacts added',
+                    onTap: () => context.push('/profile/contacts'),
+                  ),
                   _buildInfoTile(context, Icons.calendar_today_outlined, 'Member Since', 'March 2026'),
                 ]),
                 const SizedBox(height: 40),
@@ -133,11 +138,13 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildInfoTile(BuildContext context, IconData icon, String label, String value) {
+  Widget _buildInfoTile(BuildContext context, IconData icon, String label, String value, {VoidCallback? onTap}) {
     return ListTile(
       leading: Icon(icon, color: AppTheme.textSecondary),
       title: Text(label, style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
       subtitle: Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+      trailing: onTap != null ? const Icon(Icons.chevron_right, size: 20) : null,
+      onTap: onTap,
       dense: true,
     );
   }

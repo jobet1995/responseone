@@ -9,18 +9,13 @@ final authServiceProvider = Provider<AuthService>((ref) {
 
 /// Notifier to manage the current user session and authentication state.
 class UserNotifier extends Notifier<AsyncValue<UserModel?>> {
-  late final AuthService _authService;
-
   @override
   AsyncValue<UserModel?> build() {
-    _authService = ref.watch(authServiceProvider);
-    
-    // We can't return a Future directly from a regular Notifier's build 
-    // without using AsyncNotifier. But since we want to manage AsyncValue manually
-    // for now to match the previous logic:
     _initialize();
     return const AsyncValue.loading();
   }
+
+  AuthService get _authService => ref.read(authServiceProvider);
 
   /// Initial check for existing session on app startup.
   Future<void> _initialize() async {

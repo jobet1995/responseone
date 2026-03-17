@@ -10,15 +10,11 @@ final emergencyServiceProvider = Provider<EmergencyService>((ref) {
 
 /// Notifier to manage active and historical emergency reports.
 class EmergencyNotifier extends Notifier<AsyncValue<List<EmergencyModel>>> {
-  late final EmergencyService _emergencyService;
-  late final String? _userId;
-
   @override
   AsyncValue<List<EmergencyModel>> build() {
-    _emergencyService = ref.watch(emergencyServiceProvider);
-    _userId = ref.watch(currentUserProvider).value?.id;
+    final user = ref.watch(currentUserProvider).value;
     
-    if (_userId != null) {
+    if (user != null) {
       // Small delay to avoid side-effects during build
       Future.microtask(() => fetchHistory());
     }
@@ -26,12 +22,16 @@ class EmergencyNotifier extends Notifier<AsyncValue<List<EmergencyModel>>> {
     return const AsyncValue.loading();
   }
 
+  EmergencyService get _emergencyService => ref.read(emergencyServiceProvider);
+  String? get _userId => ref.read(currentUserProvider).value?.id;
+
   /// Fetches the emergency history for the current user.
   Future<void> fetchHistory() async {
-    if (_userId == null) return;
+    final userId = _userId;
+    if (userId == null) return;
     state = const AsyncValue.loading();
     try {
-      final history = await _emergencyService.getEmergencyHistory(_userId);
+      final history = await _emergencyService.getEmergencyHistory(userId);
       state = AsyncValue.data(history);
     } catch (e, st) {
       state = AsyncValue.error(e, st);

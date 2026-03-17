@@ -58,10 +58,19 @@ class HomeScreen extends ConsumerWidget {
               emergencyHistory.when(
                 data: (history) {
                   if (history.isEmpty) {
-                    return const Center(
+                    return Center(
                       child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 40),
-                        child: Text('No recent emergency reports.'),
+                        padding: const EdgeInsets.symmetric(vertical: 40),
+                        child: Column(
+                          children: [
+                            Icon(Icons.history, size: 48, color: Colors.grey.withValues(alpha: 0.3)),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'No recent emergencies',
+                              style: TextStyle(color: AppTheme.textSecondary),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   }
