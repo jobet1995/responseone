@@ -1,4 +1,7 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter/foundation.dart';
+import '../config/routes.dart';
+import 'dart:convert';
 
 /// Service to handle push and local notifications.
 class NotificationService {
@@ -35,9 +38,22 @@ class NotificationService {
   /// Callback when a user taps on a notification.
   void _onNotificationTapped(NotificationResponse response) {
     final String? payload = response.payload;
-    if (payload != null) {
-      // Logic to navigate to a specific screen based on payload
-      // e.g., Navigator.pushNamed(context, '/emergency_detail', arguments: payload);
+    if (payload != null && payload.isNotEmpty) {
+      try {
+        // Assume payload can be a direct route string or a JSON object
+        if (payload.startsWith('{')) {
+          final Map<String, dynamic> data = jsonDecode(payload);
+          final String? route = data['route'];
+          if (route != null) {
+            AppRouter.router.push(route);
+          }
+        } else {
+          // Fallback to direct route strings
+          AppRouter.router.push(payload);
+        }
+      } catch (e) {
+        debugPrint('Error handling notification tap: $e');
+      }
     }
   }
 

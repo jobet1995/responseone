@@ -9,6 +9,7 @@ void main() async {
   // Initialize critical services
   await NotificationService.instance.initialize();
   
+  
   runApp(
     const ProviderScope(
       child: ResQNowApp(),
