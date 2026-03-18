@@ -28,6 +28,7 @@ import '../screens/emergency/mental_health_crisis_screen.dart';
 import '../screens/onboarding/onboarding_screen.dart';
 import '../screens/safety/safety_toolkit_screen.dart';
 import '../screens/safety/preparedness_screen.dart';
+import '../screens/safety/active_checklist_screen.dart';
 import '../screens/safety/weather_alert_screen.dart';
 import '../screens/safety/fake_call_screen.dart';
 import '../screens/safety/in_call_screen.dart';
@@ -69,6 +70,7 @@ class AppRouteNames {
   static const String fakeCall = 'fake_call';
   static const String inCall = 'in_call';
   static const String shareLocation = 'share_location';
+  static const String checklist = 'checklist';
 }
 
 class AppRouter {
@@ -213,6 +215,14 @@ class AppRouter {
         path: '/share-location',
         name: AppRouteNames.shareLocation,
         builder: (context, state) => const ShareLocationScreen(),
+      ),
+      GoRoute(
+        path: '/checklist/:categoryId',
+        name: AppRouteNames.checklist,
+        builder: (context, state) {
+          final categoryId = state.pathParameters['categoryId'] ?? 'fire';
+          return ActiveChecklistScreen(categoryId: categoryId);
+        },
       ),
       GoRoute(
         path: '/first-aid/:title',

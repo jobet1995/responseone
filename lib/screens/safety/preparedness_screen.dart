@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../config/themes.dart';
+import '../../config/routes.dart';
 
 class PreparednessScreen extends StatelessWidget {
   const PreparednessScreen({super.key});
@@ -40,6 +42,7 @@ class PreparednessScreen extends StatelessWidget {
             icon: Icons.local_fire_department_rounded,
             color: Colors.orange,
             progress: 0.0,
+            categoryId: 'fire',
           ),
           _buildChecklistTile(
             context,
@@ -48,6 +51,7 @@ class PreparednessScreen extends StatelessWidget {
             icon: Icons.water_drop_rounded,
             color: Colors.blue,
             progress: 0.3,
+            categoryId: 'flood',
           ),
           _buildChecklistTile(
             context,
@@ -56,6 +60,7 @@ class PreparednessScreen extends StatelessWidget {
             icon: Icons.landscape_rounded,
             color: Colors.brown,
             progress: 0.0,
+            categoryId: 'earthquake',
           ),
           const SizedBox(height: 32),
           const Text(
@@ -138,6 +143,7 @@ class PreparednessScreen extends StatelessWidget {
     required IconData icon,
     required Color color,
     required double progress,
+    required String categoryId,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -175,11 +181,10 @@ class PreparednessScreen extends StatelessWidget {
           ],
         ),
         trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey),
-        onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Checklist details coming soon!')),
-          );
-        },
+        onTap: () => context.pushNamed(
+          AppRouteNames.checklist,
+          pathParameters: {'categoryId': categoryId},
+        ),
       ),
     );
   }

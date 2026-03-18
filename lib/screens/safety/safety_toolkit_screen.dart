@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:torch_light/torch_light.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../config/themes.dart';
 import '../../models/emergency_model.dart';
 
@@ -171,6 +172,62 @@ class _SafetyToolkitScreenState extends State<SafetyToolkitScreen> {
     });
   }
 
+  Future<void> _openCrisisCamera() async {
+    try {
+      final picker = ImagePicker();
+      // Show a dialog to choose between Photo and Video
+      final choice = await showModalBottomSheet<String>(
+        context: context,
+        builder: (context) => SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.camera_alt_rounded),
+                title: const Text('Take Photo'),
+                onTap: () => Navigator.pop(context, 'photo'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.videocam_rounded),
+                title: const Text('Record Video'),
+                onTap: () => Navigator.pop(context, 'video'),
+              ),
+            ],
+          ),
+        ),
+      );
+
+      if (choice == null) return;
+
+      XFile? file;
+      if (choice == 'photo') {
+        file = await picker.pickImage(source: ImageSource.camera);
+      } else {
+        file = await picker.pickVideo(source: ImageSource.camera);
+      }
+
+      if (file != null && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Crisis ${choice == 'photo' ? 'photo' : 'video'} captured successfully.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        // In a real app, we would upload this or save it to a specific crisis folder
+      }
+    } catch (e) {
+      debugPrint('Camera Error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not open camera. Please check permissions.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -258,6 +315,13 @@ class _SafetyToolkitScreenState extends State<SafetyToolkitScreen> {
               icon: Icons.directions_walk_rounded,
               color: Colors.purple,
               onTap: () => context.push('/request', extra: EmergencyType.walkWithMe),
+            ),
+            _buildActionTile(
+              title: 'Crisis Camera',
+              subtitle: 'Quickly capture evidence of an incident.',
+              icon: Icons.camera_alt_rounded,
+              color: Colors.orange,
+              onTap: _openCrisisCamera,
             ),
             const SizedBox(height: 48),
             Container(
