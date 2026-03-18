@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../providers/user_provider.dart';
 import '../../providers/emergency_provider.dart';
 import '../../config/themes.dart';
+import '../../config/routes.dart';
 import '../../widgets/emergency_card.dart';
 import 'emergency_buttons.dart';
 
@@ -155,7 +156,7 @@ class HomeScreen extends ConsumerWidget {
               'Heavy rain expected in your area. Stay indoors.',
               Icons.thunderstorm,
               Colors.orange,
-              onTap: () {},
+              onTap: () => context.pushNamed(AppRouteNames.weatherAlert),
             ),
             const SizedBox(height: 12),
             _buildAlertCard(

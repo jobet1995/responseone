@@ -28,6 +28,7 @@ import '../screens/emergency/mental_health_crisis_screen.dart';
 import '../screens/onboarding/onboarding_screen.dart';
 import '../screens/safety/safety_toolkit_screen.dart';
 import '../screens/safety/preparedness_screen.dart';
+import '../screens/safety/weather_alert_screen.dart';
 import '../models/emergency_model.dart';
 
 /// Route constants for the ResQNow application.
@@ -61,6 +62,7 @@ class AppRouteNames {
   static const String settings = 'settings';
   static const String about = 'about';
   static const String notifications = 'notifications';
+  static const String weatherAlert = 'weather_alert';
 }
 
 class AppRouter {
@@ -179,6 +181,11 @@ class AppRouter {
         path: '/notifications',
         name: AppRouteNames.notifications,
         builder: (context, state) => const NotificationCenterScreen(),
+      ),
+      GoRoute(
+        path: '/weather-alert',
+        name: AppRouteNames.weatherAlert,
+        builder: (context, state) => const WeatherAlertScreen(),
       ),
       GoRoute(
         path: '/first-aid/:title',
