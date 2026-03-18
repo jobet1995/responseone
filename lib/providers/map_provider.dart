@@ -41,16 +41,24 @@ class MapState {
 class MapNotifier extends Notifier<MapState> {
   final SupabaseClient _supabase = Supabase.instance.client;
   Timer? _refreshTimer;
+  StreamSubscription<LocationCoordinate>? _locationSubscription;
 
   @override
   MapState build() {
     initMap();
     
-    // Set up periodic refresh
+    // Set up periodic marker refresh (responders/emergencies)
     _refreshTimer = Timer.periodic(const Duration(seconds: 30), (_) => refreshMarkers());
+    
+    // Set up real-time user location tracking
+    _locationSubscription = LocationService.instance.getLocationStream().listen(
+      (location) => updateUserLocation(location),
+      onError: (e) => debugPrint('MapNotifier: Location stream error: $e'),
+    );
     
     ref.onDispose(() {
       _refreshTimer?.cancel();
+      _locationSubscription?.cancel();
     });
 
     return MapState(isLoading: true);
@@ -58,11 +66,30 @@ class MapNotifier extends Notifier<MapState> {
 
   Future<void> initMap() async {
     // Get initial user location
-    final location = await LocationService.instance.getCurrentLocation();
-    state = state.copyWith(userLocation: location, isLoading: false);
+    try {
+      final location = await LocationService.instance.getCurrentLocation();
+      if (location == null) {
+        state = state.copyWith(
+          isLoading: false,
+          errorMessage: 'Could not determine your location. Please ensure GPS is ON and permissions are granted.',
+        );
+      } else {
+        state = state.copyWith(userLocation: location, isLoading: false, errorMessage: null);
+      }
+    } catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: 'Error initializing map location');
+    }
 
     // Fetch initial markers
     await refreshMarkers();
+  }
+
+  /// Manually force a location refresh
+  Future<void> refreshLocation() async {
+    final location = await LocationService.instance.getCurrentLocation();
+    if (location != null) {
+      updateUserLocation(location);
+    }
   }
 
   Future<void> refreshMarkers() async {

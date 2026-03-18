@@ -100,14 +100,14 @@ class _SafetyMapScreenState extends ConsumerState<SafetyMapScreen> {
                   color: Colors.black.withValues(alpha: 0.7),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.location_off, color: Colors.white, size: 20),
-                    SizedBox(width: 12),
+                    const Icon(Icons.location_off, color: Colors.white, size: 20),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Location unavailable. Showing default map.',
-                        style: TextStyle(color: Colors.white, fontSize: 13),
+                        mapState.errorMessage ?? 'Location unavailable. Showing default map.',
+                        style: const TextStyle(color: Colors.white, fontSize: 13),
                       ),
                     ),
                   ],

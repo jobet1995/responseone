@@ -76,5 +76,19 @@
 	<string>ResQNow needs access to your location to provide emergency assistance and track your position in real-time during an active incident.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>ResQNow needs access to your location to ensure you receive timely help and can be tracked by responders during an emergency.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>ResQNow needs access to your location to track your position in real-time during an emergency, even when the app is in the background.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>remote-notification</string>
+	</array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>sms</string>
+		<string>tel</string>
+		<string>mailto</string>
+		<string>https</string>
+	</array>
 </dict>
 </plist>
