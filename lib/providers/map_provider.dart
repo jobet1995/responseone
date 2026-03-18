@@ -11,22 +11,29 @@ class MapState {
   final List<Marker> markers;
   final LocationCoordinate? userLocation;
   final bool isLoading;
+  final String? errorMessage;
+
+  // Manila as a sensible default if location is totally unavailable
+  static const defaultLocation = LocationCoordinate(latitude: 14.5995, longitude: 120.9842);
 
   MapState({
     this.markers = const [],
     this.userLocation,
     this.isLoading = false,
+    this.errorMessage,
   });
 
   MapState copyWith({
     List<Marker>? markers,
     LocationCoordinate? userLocation,
     bool? isLoading,
+    String? errorMessage,
   }) {
     return MapState(
       markers: markers ?? this.markers,
       userLocation: userLocation ?? this.userLocation,
       isLoading: isLoading ?? this.isLoading,
+      errorMessage: errorMessage ?? this.errorMessage,
     );
   }
 }
@@ -65,9 +72,13 @@ class MapNotifier extends Notifier<MapState> {
       // 1. Fetch Responders
       final respondersData = await _supabase.from('responders').select().eq('is_available', true);
       for (var data in respondersData) {
-        final locMap = data['current_location'] as Map<String, dynamic>;
-        final lat = (locMap['latitude'] as num).toDouble();
-        final lng = (locMap['longitude'] as num).toDouble();
+        final locMap = data['current_location'] as Map<String, dynamic>?;
+        if (locMap == null) continue;
+
+        final lat = (locMap['latitude'] as num?)?.toDouble();
+        final lng = (locMap['longitude'] as num?)?.toDouble();
+        
+        if (lat == null || lng == null) continue;
         
         newMarkers.add(
           Marker(
@@ -91,9 +102,13 @@ class MapNotifier extends Notifier<MapState> {
           .not('status', 'eq', 'Cancelled');
       
       for (var data in emergenciesData) {
-        final locMap = data['location'] as Map<String, dynamic>;
-        final lat = (locMap['latitude'] as num).toDouble();
-        final lng = (locMap['longitude'] as num).toDouble();
+        final locMap = data['location'] as Map<String, dynamic>?;
+        if (locMap == null) continue;
+
+        final lat = (locMap['latitude'] as num?)?.toDouble();
+        final lng = (locMap['longitude'] as num?)?.toDouble();
+
+        if (lat == null || lng == null) continue;
 
         newMarkers.add(
           Marker(
@@ -109,9 +124,10 @@ class MapNotifier extends Notifier<MapState> {
         );
       }
 
-      state = state.copyWith(markers: newMarkers);
+      state = state.copyWith(markers: newMarkers, errorMessage: null);
     } catch (e) {
-      print('Error fetching map markers: $e');
+      debugPrint('Error fetching map markers: $e');
+      state = state.copyWith(errorMessage: 'Failed to load some map data');
     }
   }
 
