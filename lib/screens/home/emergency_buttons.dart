@@ -9,50 +9,63 @@ class EmergencyButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 3,
-      mainAxisSpacing: 12,
-      crossAxisSpacing: 12,
-      childAspectRatio: 0.85,
-      children: [
-        _buildButton(
-          context,
-          'Medical',
-          Icons.medical_services,
-          Colors.blue,
-          EmergencyType.medical,
-        ),
-        _buildButton(
-          context,
-          'Fire',
-          Icons.local_fire_department,
-          Colors.orange,
-          EmergencyType.fire,
-        ),
-        _buildButton(
-          context,
-          'Police',
-          Icons.local_police,
-          Colors.blueGrey,
-          EmergencyType.police,
-        ),
-        _buildButton(
-          context,
-          'Mental\nHealth',
-          Icons.psychology,
-          Colors.purple,
-          EmergencyType.mentalHealth,
-        ),
-        _buildButton(
-          context,
-          'Other',
-          Icons.report_problem,
-          Colors.grey,
-          EmergencyType.other,
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const double spacing = 12.0;
+        const int crossAxisCount = 3;
+        final double itemWidth = (constraints.maxWidth - (spacing * (crossAxisCount - 1))) / crossAxisCount;
+        const double childAspectRatio = 0.85;
+        final double itemHeight = itemWidth / childAspectRatio;
+
+        final buttons = [
+          _buildButton(
+            context,
+            'Medical',
+            Icons.medical_services,
+            Colors.blue,
+            EmergencyType.medical,
+          ),
+          _buildButton(
+            context,
+            'Fire',
+            Icons.local_fire_department,
+            Colors.orange,
+            EmergencyType.fire,
+          ),
+          _buildButton(
+            context,
+            'Police',
+            Icons.local_police,
+            Colors.blueGrey,
+            EmergencyType.police,
+          ),
+          _buildButton(
+            context,
+            'Mental\nHealth',
+            Icons.psychology,
+            Colors.purple,
+            EmergencyType.mentalHealth,
+          ),
+          _buildButton(
+            context,
+            'Other',
+            Icons.report_problem,
+            Colors.grey,
+            EmergencyType.other,
+          ),
+        ];
+
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          alignment: WrapAlignment.center,
+          children: buttons.map((button) => SizedBox(
+            width: itemWidth,
+            height: itemHeight,
+            child: button,
+          )).toList(),
+        );
+      },
     );
   }
 

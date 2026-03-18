@@ -147,50 +147,53 @@ class HomeScreen extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 12),
-        SizedBox(
-          height: 140,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: [
-              _buildAlertCard(
-                context,
-                'Severe Weather',
-                'Heavy rain expected in your area. Stay indoors.',
-                Icons.thunderstorm,
-                Colors.orange,
-                onTap: () {},
-              ),
-              const SizedBox(width: 12),
-              _buildAlertCard(
-                context,
-                'Safety Workshop',
-                'Join our First Aid training this Saturday.',
-                Icons.school,
-                AppTheme.secondaryBlue,
-                onTap: () => context.push('/first-aid'),
-              ),
-              const SizedBox(width: 12),
-              _buildAlertCard(
-                context,
-                'Emergency Kit',
-                'Is your emergency kit ready? Check our guide.',
-                Icons.backpack,
-                Colors.green,
-                onTap: () => context.push('/preparedness'),
-              ),
-            ],
-          ),
+        Column(
+          children: [
+            _buildAlertCard(
+              context,
+              'Severe Weather',
+              'Heavy rain expected in your area. Stay indoors.',
+              Icons.thunderstorm,
+              Colors.orange,
+              onTap: () {},
+            ),
+            const SizedBox(height: 12),
+            _buildAlertCard(
+              context,
+              'Safety Workshop',
+              'Join our First Aid training this Saturday.',
+              Icons.school,
+              AppTheme.secondaryBlue,
+              onTap: () => context.push('/first-aid'),
+            ),
+            const SizedBox(height: 12),
+            _buildAlertCard(
+              context,
+              'Emergency Kit',
+              'Is your emergency kit ready? Check our guide.',
+              Icons.backpack,
+              Colors.green,
+              onTap: () => context.push('/preparedness'),
+            ),
+          ],
         ),
       ],
     );
   }
 
-  Widget _buildAlertCard(BuildContext context, String title, String desc, IconData icon, Color color, {VoidCallback? onTap}) {
+  Widget _buildAlertCard(
+    BuildContext context,
+    String title,
+    String desc,
+    IconData icon,
+    Color color, {
+    VoidCallback? onTap,
+  }) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(AppTheme.borderRadius),
       child: Container(
-        width: 260,
+        width: double.infinity,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: color.withOpacity(0.1),
