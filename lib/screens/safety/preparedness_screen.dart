@@ -74,17 +74,21 @@ class PreparednessScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           _buildResourceCard(
+            context,
             title: 'The Perfect Go-Bag',
             description: 'A comprehensive list of essentials for your emergency kit.',
             imageIcon: Icons.backpack_rounded,
             color: Colors.teal,
+            resourceId: 'go-bag',
           ),
           const SizedBox(height: 12),
           _buildResourceCard(
+            context,
             title: 'Family Communication Plan',
             description: 'How to stay in touch when service is down.',
             imageIcon: Icons.family_restroom_rounded,
             color: Colors.indigo,
+            resourceId: 'family-plan',
           ),
         ],
       ),
@@ -189,13 +193,21 @@ class PreparednessScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildResourceCard({
+  Widget _buildResourceCard(
+    BuildContext context, {
     required String title,
     required String description,
     required IconData imageIcon,
     required Color color,
+    required String resourceId,
   }) {
-    return Container(
+    return InkWell(
+      onTap: () => context.pushNamed(
+        AppRouteNames.resource,
+        pathParameters: {'resourceId': resourceId},
+      ),
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -232,6 +244,7 @@ class PreparednessScreen extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 }

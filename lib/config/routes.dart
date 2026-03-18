@@ -29,6 +29,7 @@ import '../screens/onboarding/onboarding_screen.dart';
 import '../screens/safety/safety_toolkit_screen.dart';
 import '../screens/safety/preparedness_screen.dart';
 import '../screens/safety/active_checklist_screen.dart';
+import '../screens/safety/resource_detail_screen.dart';
 import '../screens/safety/weather_alert_screen.dart';
 import '../screens/safety/fake_call_screen.dart';
 import '../screens/safety/in_call_screen.dart';
@@ -71,6 +72,7 @@ class AppRouteNames {
   static const String inCall = 'in_call';
   static const String shareLocation = 'share_location';
   static const String checklist = 'checklist';
+  static const String resource = 'resource';
 }
 
 class AppRouter {
@@ -222,6 +224,14 @@ class AppRouter {
         builder: (context, state) {
           final categoryId = state.pathParameters['categoryId'] ?? 'fire';
           return ActiveChecklistScreen(categoryId: categoryId);
+        },
+      ),
+      GoRoute(
+        path: '/resource/:resourceId',
+        name: AppRouteNames.resource,
+        builder: (context, state) {
+          final resourceId = state.pathParameters['resourceId'] ?? 'go-bag';
+          return ResourceDetailScreen(resourceId: resourceId);
         },
       ),
       GoRoute(
