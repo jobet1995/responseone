@@ -59,6 +59,16 @@ class UserNotifier extends Notifier<AsyncValue<UserModel?>> {
       state = AsyncValue.error(e, st);
     }
   }
+
+  /// Updates the current user's profile information.
+  Future<void> updateUser(UserModel user) async {
+    try {
+      final updatedUser = await _authService.updateUser(user);
+      state = AsyncValue.data(updatedUser);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
 }
 
 /// Provider to access the current user's data and state.

@@ -34,26 +34,34 @@ class ProfileScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 20),
-                Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 60,
-                      backgroundColor: AppTheme.primaryRed.withValues(alpha: 0.1),
-                      child: const Icon(Icons.person, size: 80, color: AppTheme.primaryRed),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: AppTheme.primaryRed,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.camera_alt, size: 20, color: Colors.white),
+                GestureDetector(
+                  onTap: () => context.push('/profile/edit'),
+                  child: Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 60,
+                        backgroundColor: AppTheme.primaryRed.withOpacity(0.1),
+                        backgroundImage: user.avatarUrl.isNotEmpty 
+                            ? NetworkImage(user.avatarUrl) 
+                            : null,
+                        child: user.avatarUrl.isEmpty 
+                            ? const Icon(Icons.person, size: 80, color: AppTheme.primaryRed) 
+                            : null,
                       ),
-                    ),
-                  ],
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: const BoxDecoration(
+                            color: AppTheme.primaryRed,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.edit, size: 20, color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 24),
                 Text(
@@ -68,7 +76,7 @@ class ProfileScreen extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                   decoration: BoxDecoration(
-                    color: AppTheme.secondaryBlue.withValues(alpha: 0.1),
+                    color: AppTheme.secondaryBlue.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -83,17 +91,25 @@ class ProfileScreen extends ConsumerWidget {
                 const SizedBox(height: 40),
                 _buildInfoCard(context, [
                   _buildInfoTile(context, Icons.phone_outlined, 'Phone', user.phoneNumber),
-                  _buildInfoTile(context, Icons.location_on_outlined, 'Address', 'Manila, Philippines'),
+                  _buildInfoTile(
+                    context,
+                    Icons.medical_services_outlined,
+                    'Medical Profile',
+                    'Blood type, Allergies, etc.',
+                    onTap: () => context.push('/profile/medical'),
+                  ),
                   _buildInfoTile(
                     context,
                     Icons.contact_phone_outlined,
                     'Emergency Contacts',
-                    '2 contacts added',
+                    'Trusted contacts',
                     onTap: () => context.push('/profile/contacts'),
                   ),
                   _buildInfoTile(context, Icons.calendar_today_outlined, 'Member Since', 'March 2026'),
                 ]),
-                const SizedBox(height: 40),
+                const SizedBox(height: 24),
+                _buildVolunteerSection(context, ref, user),
+                const SizedBox(height: 16),
                 CustomButton(
                   text: 'LOGOUT',
                   onPressed: () async {
@@ -130,7 +146,7 @@ class ProfileScreen extends ConsumerWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.borderRadius),
-        side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
+        side: BorderSide(color: Colors.grey.withOpacity(0.2)),
       ),
       child: Column(
         children: children,
@@ -146,6 +162,55 @@ class ProfileScreen extends ConsumerWidget {
       trailing: onTap != null ? const Icon(Icons.chevron_right, size: 20) : null,
       onTap: onTap,
       dense: true,
+    );
+  }
+
+  Widget _buildVolunteerSection(BuildContext context, WidgetRef ref, dynamic user) {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+        side: const BorderSide(color: AppTheme.secondaryBlue, width: 1),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.volunteer_activism_outlined, color: AppTheme.secondaryBlue),
+                const SizedBox(width: 8),
+                const Text(
+                  'Volunteer Mode',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.secondaryBlue),
+                ),
+                const Spacer(),
+                Switch(
+                  value: user.isVolunteer,
+                  onChanged: (v) {
+                    // Update volunteer status
+                    ref.read(currentUserProvider.notifier).updateUser(user.copyWith(isVolunteer: v));
+                  },
+                  activeColor: AppTheme.secondaryBlue,
+                ),
+              ],
+            ),
+            if (user.isVolunteer) ...[
+              const Divider(),
+              const Text(
+                'Help your community! You will be notified of nearby emergencies where you can provide basic assistance.',
+                style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Skills: ${user.skills.isEmpty ? "None added" : user.skills}',
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }

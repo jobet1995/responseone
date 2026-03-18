@@ -8,57 +8,110 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      backgroundColor: Colors.grey[50],
+      appBar: AppBar(
+        title: const Text('Settings'),
+        backgroundColor: Colors.white,
+        foregroundColor: AppTheme.textPrimary,
+        elevation: 0,
+      ),
       body: ListView(
-        padding: const EdgeInsets.all(AppTheme.defaultPadding),
+        padding: const EdgeInsets.symmetric(vertical: 16),
         children: [
-          _buildSectionHeader('General'),
+          _buildSectionHeader('Preferences'),
           _buildSettingsTile(
             context,
-            Icons.notifications_outlined,
-            'Notifications',
-            'Manage push and in-app alerts',
-            trailing: Switch(value: true, onChanged: (_) {}),
+            Icons.notifications_active_outlined,
+            'Push Notifications',
+            'Stay updated with real-time alerts',
+            trailing: Switch(
+              value: true, 
+              onChanged: (_) {},
+              activeColor: AppTheme.primaryRed,
+            ),
+          ),
+          _buildSettingsTile(
+            context,
+            Icons.location_on_outlined,
+            'Location Services',
+            'Required for emergency response',
+            trailing: Switch(
+              value: true, 
+              onChanged: (_) {},
+              activeColor: AppTheme.primaryRed,
+            ),
           ),
           _buildSettingsTile(
             context,
             Icons.dark_mode_outlined,
-            'Dark Mode',
-            'Toggle application theme',
-            trailing: Switch(value: false, onChanged: (_) {}),
-          ),
-          const SizedBox(height: 24),
-          _buildSectionHeader('Account & Privacy'),
-          _buildSettingsTile(
-            context,
-            Icons.lock_outline,
-            'Change Password',
-            'Update your login credentials',
+            'Appearance',
+            'System / Light / Dark',
             onTap: () {},
           ),
+          const SizedBox(height: 32),
+          _buildSectionHeader('Safety & Security'),
           _buildSettingsTile(
             context,
-            Icons.security_outlined,
-            'Privacy Policy',
-            'Read our terms of service',
+            Icons.fingerprint_rounded,
+            'Biometric Login',
+            'Secure your account with Face/Touch ID',
+            trailing: Switch(
+              value: false, 
+              onChanged: (_) {},
+              activeColor: AppTheme.primaryRed,
+            ),
+          ),
+          _buildSettingsTile(
+            context,
+            Icons.shield_outlined,
+            'Emergency Broadcast',
+            'Enable sharing with nearby users',
+            trailing: Switch(
+              value: true, 
+              onChanged: (_) {},
+              activeColor: AppTheme.primaryRed,
+            ),
+          ),
+          _buildSettingsTile(
+            context,
+            Icons.lock_reset_rounded,
+            'Update Password',
+            'Keep your account secure',
             onTap: () {},
           ),
-          const SizedBox(height: 24),
-          _buildSectionHeader('About'),
+          const SizedBox(height: 32),
+          _buildSectionHeader('Support & Info'),
           _buildSettingsTile(
             context,
-            Icons.info_outline,
-            'Version',
-            'ResQNow v1.0.0+1',
+            Icons.info_outline_rounded,
+            'About ResQNow',
+            'Version, mission, and legal info',
             onTap: () => context.push('/settings/about'),
           ),
           _buildSettingsTile(
             context,
-            Icons.help_outline,
-            'Help & Support',
-            'Contact our team for assistance',
+            Icons.help_center_outlined,
+            'Help Center',
+            'FAQs and contact support',
             onTap: () {},
           ),
+          const SizedBox(height: 48),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: TextButton(
+              onPressed: () {},
+              style: TextButton.styleFrom(
+                foregroundColor: AppTheme.primaryRed,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: const BorderSide(color: AppTheme.primaryRed),
+                ),
+              ),
+              child: const Text('LOG OUT', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ),
+          const SizedBox(height: 40),
         ],
       ),
     );
@@ -66,14 +119,14 @@ class SettingsScreen extends StatelessWidget {
 
   Widget _buildSectionHeader(String title) {
     return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: 8),
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 12),
       child: Text(
         title.toUpperCase(),
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.bold,
-          color: AppTheme.primaryRed,
-          letterSpacing: 1.0,
+          color: Colors.grey[600],
+          letterSpacing: 1.2,
         ),
       ),
     );
@@ -87,18 +140,32 @@ class SettingsScreen extends StatelessWidget {
     Widget? trailing,
     VoidCallback? onTap,
   }) {
-    return Card(
-      elevation: 0,
-      margin: const EdgeInsets.only(bottom: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppTheme.borderRadius),
-        side: BorderSide(color: Colors.grey.withValues(alpha: 0.1)),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: ListTile(
-        leading: Icon(icon, color: AppTheme.textPrimary),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
-        trailing: trailing ?? (onTap != null ? const Icon(Icons.chevron_right) : null),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: AppTheme.primaryRed.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: AppTheme.primaryRed, size: 22),
+        ),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+        subtitle: Text(subtitle, style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
+        trailing: trailing ?? (onTap != null ? const Icon(Icons.arrow_forward_ios_rounded, size: 14) : null),
         onTap: onTap,
       ),
     );

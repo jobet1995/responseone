@@ -37,4 +37,16 @@ class MessageModel {
       'created_at': createdAt.toIso8601String(),
     };
   }
+
+  MessageModel copyWith({
+    String? text,
+  }) {
+    return MessageModel(
+      id: id,
+      emergencyId: emergencyId,
+      senderId: senderId,
+      text: text ?? this.text,
+      createdAt: createdAt,
+    );
+  }
 }

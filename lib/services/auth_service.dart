@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:crypto/crypto.dart';
 import 'package:uuid/uuid.dart';
@@ -135,6 +137,48 @@ class AuthService {
       }
     }
     return null;
+  }
+
+  /// Uploads a profile picture to Supabase Storage.
+  Future<String> uploadAvatar(XFile image) async {
+    try {
+      final String userId = (await getCurrentUser())?.id ?? _uuid.v4();
+      final Uint8List bytes = await image.readAsBytes();
+      final String fileExt = image.name.split('.').last;
+      final String fileName = '$userId-${DateTime.now().millisecondsSinceEpoch}.$fileExt';
+      final String path = fileName;
+
+      await _supabase.storage.from('avatars').uploadBinary(
+            path,
+            bytes,
+            fileOptions: const FileOptions(cacheControl: '3600', upsert: true),
+          );
+
+      final String publicUrl = _supabase.storage.from('avatars').getPublicUrl(path);
+      return publicUrl;
+    } catch (e) {
+      print('Error uploading avatar: $e');
+      rethrow;
+    }
+  }
+
+  /// Updates user data in the database and local storage.
+  Future<UserModel> updateUser(UserModel user) async {
+    try {
+      final data = user.toMap();
+      // Remove sensitive or non-updatable fields if necessary
+      data.remove('password_hash');
+      
+      await _supabase
+          .from('users')
+          .update(data)
+          .eq('id', user.id);
+      
+      await _saveUser(user);
+      return user;
+    } catch (e) {
+      rethrow;
+    }
   }
 
   // --- Storage Helpers ---

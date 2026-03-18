@@ -72,54 +72,50 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
     }
   }
 
+  final List<String> _tags = [
+    'Fast Response', 'Professional', 'Helpful', 'Knowledgeable', 'Safe', 'Clear Communication'
+  ];
+  final Set<String> _selectedTags = {};
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Rate Responser'),
-        backgroundColor: AppTheme.primaryRed,
-        foregroundColor: Colors.white,
+        title: const Text('Rating & Feedback'),
+        backgroundColor: Colors.white,
+        foregroundColor: AppTheme.textPrimary,
+        elevation: 0,
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            const SizedBox(height: 20),
+            _buildResponderInfo(),
+            const SizedBox(height: 48),
             const Text(
-              'How was the response?',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              'How was your experience?',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             const Text(
-              'Your feedback helps us improve our emergency response network.',
-              style: TextStyle(color: AppTheme.textSecondary),
+              'Your rating helps us maintain high quality\nservice in our emergency network.',
+              style: TextStyle(color: AppTheme.textSecondary, height: 1.5),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(5, (index) {
-                return IconButton(
-                  icon: Icon(
-                    index < _rating ? Icons.star : Icons.star_border,
-                    size: 48,
-                    color: Colors.amber,
-                  ),
-                  onPressed: () => setState(() => _rating = index + 1),
-                );
-              }),
-            ),
-            const SizedBox(height: 32),
-            TextField(
-              controller: _commentController,
-              maxLines: 4,
-              decoration: const InputDecoration(
-                hintText: 'Add a comment (optional)...',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 32),
+            _buildStarRating(),
+            const SizedBox(height: 40),
+            if (_rating > 0) ...[
+              _buildTagsSection(),
+              const SizedBox(height: 32),
+            ],
+            _buildCommentSection(),
+            const SizedBox(height: 48),
             CustomButton(
               text: 'SUBMIT FEEDBACK',
               onPressed: _submitFeedback,
@@ -127,11 +123,135 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
             ),
             TextButton(
               onPressed: () => context.go('/home'),
-              child: const Text('Skip for now', style: TextStyle(color: AppTheme.textSecondary)),
+              child: const Text('Skip for now', style: TextStyle(color: AppTheme.textSecondary, fontWeight: FontWeight.w500)),
             ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildResponderInfo() {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: AppTheme.primaryRed.withOpacity(0.1), width: 3),
+          ),
+          child: CircleAvatar(
+            radius: 40,
+            backgroundColor: AppTheme.primaryRed.withOpacity(0.05),
+            child: const Icon(Icons.person, size: 40, color: AppTheme.primaryRed),
+          ),
+        ),
+        const SizedBox(height: 16),
+        const Text(
+          'Emergency Responder',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        Text(
+          'Incident ID: ${widget.emergencyId.substring(0, 8)}',
+          style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStarRating() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(5, (index) {
+        final bool isFilled = index < _rating;
+        return GestureDetector(
+          onTap: () => setState(() => _rating = index + 1),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Icon(
+              isFilled ? Icons.star_rounded : Icons.star_outline_rounded,
+              size: 56,
+              color: isFilled ? Colors.amber[600] : Colors.grey[300],
+            ),
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildTagsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'WHAT WENT WELL?',
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary, letterSpacing: 1),
+        ),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: _tags.map((tag) {
+            final isSelected = _selectedTags.contains(tag);
+            return FilterChip(
+              label: Text(tag),
+              selected: isSelected,
+              onSelected: (selected) {
+                setState(() {
+                  if (selected) _selectedTags.add(tag);
+                  else _selectedTags.remove(tag);
+                });
+              },
+              backgroundColor: Colors.white,
+              selectedColor: AppTheme.primaryRed.withOpacity(0.1),
+              checkmarkColor: AppTheme.primaryRed,
+              labelStyle: TextStyle(
+                color: isSelected ? AppTheme.primaryRed : AppTheme.textSecondary,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: isSelected ? AppTheme.primaryRed : Colors.grey[300]!),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCommentSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'COMMENTS',
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary, letterSpacing: 1),
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: _commentController,
+          maxLines: 4,
+          decoration: InputDecoration(
+            hintText: 'Share more about your experience...',
+            filled: true,
+            fillColor: Colors.grey[50],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey[200]!),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey[200]!),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppTheme.primaryRed),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -46,4 +46,19 @@ class FeedbackModel {
       'created_at': createdAt.toIso8601String(),
     };
   }
+
+  FeedbackModel copyWith({
+    int? rating,
+    String? comment,
+  }) {
+    return FeedbackModel(
+      id: id,
+      emergencyId: emergencyId,
+      citizenId: citizenId,
+      responderId: responderId,
+      rating: rating ?? this.rating,
+      comment: comment ?? this.comment,
+      createdAt: createdAt,
+    );
+  }
 }

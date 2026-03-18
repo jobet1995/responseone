@@ -10,7 +10,7 @@ void main() async {
   
   try {
     // Load environment variables
-    await dotenv.load(fileName: ".env");
+    await dotenv.load(fileName: "assets/.env");
 
     final supabaseUrl = dotenv.env['SUPABASE_URL'];
     final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'];

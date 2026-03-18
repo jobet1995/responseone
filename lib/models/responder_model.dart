@@ -92,18 +92,18 @@ class ResponderModel {
   factory ResponderModel.fromMap(Map<String, dynamic> map) {
     return ResponderModel(
       id: map['id'] ?? '',
-      userId: map['userId'] ?? '',
+      userId: map['user_id'] ?? map['userId'] ?? '',
       name: map['name'] ?? '',
-      vehicleNumber: map['vehicleNumber'] ?? '',
+      vehicleNumber: map['vehicle_number'] ?? map['vehicleNumber'] ?? '',
       type: ResponderType.fromString(map['type']),
       status: ResponderStatus.fromString(map['status']),
-      isAvailable: map['isAvailable'] ?? false,
-      currentLocation: map['currentLocation'] != null 
-          ? LocationCoordinate.fromMap(map['currentLocation']) 
+      isAvailable: map['is_available'] ?? map['isAvailable'] ?? false,
+      currentLocation: (map['current_location'] != null || map['currentLocation'] != null)
+          ? LocationCoordinate.fromMap(map['current_location'] ?? map['currentLocation']) 
           : null,
       rating: (map['rating'] as num?)?.toDouble() ?? 0.0,
-      totalResponses: map['totalResponses'] as int? ?? 0,
-      activeEmergencyId: map['activeEmergencyId'] as String?,
+      totalResponses: (map['total_responses'] ?? map['totalResponses']) as int? ?? 0,
+      activeEmergencyId: (map['active_emergency_id'] ?? map['activeEmergencyId']) as String?,
     );
   }
 
@@ -111,16 +111,16 @@ class ResponderModel {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'userId': userId,
+      'user_id': userId,
       'name': name,
-      'vehicleNumber': vehicleNumber,
+      'vehicle_number': vehicleNumber,
       'type': type.value,
       'status': status.value,
-      'isAvailable': isAvailable,
-      'currentLocation': currentLocation?.toMap(),
+      'is_available': isAvailable,
+      'current_location': currentLocation?.toMap(),
       'rating': rating,
-      'totalResponses': totalResponses,
-      'activeEmergencyId': activeEmergencyId,
+      'total_responses': totalResponses,
+      'active_emergency_id': activeEmergencyId,
     };
   }
 

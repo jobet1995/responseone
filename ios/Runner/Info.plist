@@ -66,5 +66,11 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>ResQNow needs access to your photo library so you can upload a profile picture.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>ResQNow needs access to your camera so you can take a profile photo.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>ResQNow needs access to your microphone if you record a video message.</string>
 </dict>
 </plist>

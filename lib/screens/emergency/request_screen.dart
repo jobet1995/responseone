@@ -67,27 +67,35 @@ class _RequestScreenState extends ConsumerState<RequestScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Text(
-              'What is the nature of the emergency?',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              'Nature of Emergency',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textSecondary, letterSpacing: 1.1),
             ),
             const SizedBox(height: 16),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: EmergencyType.values.map((type) {
-                final isSelected = _selectedType == type;
-                return ChoiceChip(
-                  label: Text(type.value),
-                  selected: isSelected,
-                  onSelected: (_) => setState(() => _selectedType = type),
-                  selectedColor: AppTheme.primaryRed.withValues(alpha: 0.2),
-                  labelStyle: TextStyle(
-                    color: isSelected ? AppTheme.primaryRed : AppTheme.textPrimary,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  ),
-                );
-              }).toList(),
-            ),
+            if (widget.initialType != null)
+              _buildLockedTypeCard(widget.initialType!)
+            else
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: EmergencyType.values.map((type) {
+                  final isSelected = _selectedType == type;
+                  return ChoiceChip(
+                    label: Text(type.value),
+                    selected: isSelected,
+                    onSelected: (_) => setState(() => _selectedType = type),
+                    selectedColor: AppTheme.primaryRed.withOpacity(0.1),
+                    backgroundColor: Colors.white,
+                    side: BorderSide(
+                      color: isSelected ? AppTheme.primaryRed : Colors.grey[300]!,
+                      width: 1,
+                    ),
+                    labelStyle: TextStyle(
+                      color: isSelected ? AppTheme.primaryRed : AppTheme.textPrimary,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  );
+                }).toList(),
+              ),
             const SizedBox(height: 32),
             const Text(
               'Describe the situation (Optional)',
@@ -138,6 +146,32 @@ class _RequestScreenState extends ConsumerState<RequestScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildLockedTypeCard(EmergencyType type) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppTheme.primaryRed.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.primaryRed.withOpacity(0.2)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.check_circle, color: AppTheme.primaryRed, size: 20),
+          const SizedBox(width: 12),
+          Text(
+            type.value,
+            style: const TextStyle(
+              color: AppTheme.primaryRed,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+        ],
       ),
     );
   }

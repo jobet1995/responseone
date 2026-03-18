@@ -6,6 +6,7 @@ import '../screens/home/home_screen.dart';
 import '../screens/emergency/request_screen.dart';
 import '../screens/emergency/live_tracking_screen.dart';
 import '../screens/emergency/first_aid_screen.dart';
+import '../screens/emergency/first_aid_detail_screen.dart';
 import '../screens/responder/responder_dashboard.dart';
 import '../screens/responder/responder_request_detail.dart';
 import '../screens/admin/admin_dashboard.dart';
@@ -16,9 +17,12 @@ import '../screens/emergency/feedback_screen.dart';
 import '../screens/emergency/chat_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../screens/profile/edit_profile_screen.dart';
+import '../screens/profile/medical_profile_screen.dart';
 import '../screens/profile/emergency_contacts_screen.dart';
 import '../screens/settings/settings_screen.dart';
 import '../screens/settings/about_screen.dart';
+import '../screens/main_screen.dart';
+import '../screens/home/safety_map_screen.dart';
 import '../screens/splash_screen.dart';
 import '../models/emergency_model.dart';
 
@@ -30,18 +34,21 @@ class AppRouteNames {
   static const String login = 'login';
   static const String register = 'register';
   static const String home = 'home';
+  static const String map = 'map';
   static const String emergencyRequest = 'emergency_request';
   static const String emergencyTracking = 'emergency_tracking';
   static const String emergencyHistory = 'emergency_history';
   static const String emergencyFeedback = 'emergency_feedback';
   static const String emergencyChat = 'emergency_chat';
   static const String firstAid = 'first_aid';
+  static const String firstAidDetail = 'first_aid_detail';
   static const String responderDashboard = 'responder_dashboard';
   static const String requestDetail = 'request_detail';
   static const String adminDashboard = 'admin_dashboard';
   static const String assignResponder = 'assign_responder';
   static const String profile = 'profile';
   static const String editProfile = 'edit_profile';
+  static const String medicalProfile = 'medical_profile';
   static const String emergencyContacts = 'emergency_contacts';
   static const String settings = 'settings';
   static const String about = 'about';
@@ -75,61 +82,85 @@ class AppRouter {
         builder: (context, state) => const RegisterScreen(),
       ),
 
-      // Main Citizen Flow
-      GoRoute(
-        path: '/home',
-        name: AppRouteNames.home,
-        builder: (context, state) => const HomeScreen(),
+      // Main Shell Flow
+      ShellRoute(
+        navigatorKey: GlobalKey<NavigatorState>(),
+        builder: (context, state, child) => MainScreen(child: child),
         routes: [
           GoRoute(
-            path: 'request',
-            name: AppRouteNames.emergencyRequest,
-            builder: (context, state) {
-              final type = state.extra as EmergencyType?;
-              return RequestScreen(initialType: type);
-            },
+            path: '/home',
+            name: AppRouteNames.home,
+            builder: (context, state) => const HomeScreen(),
           ),
           GoRoute(
-            path: 'tracking/:emergencyId',
-            name: AppRouteNames.emergencyTracking,
-            builder: (context, state) {
-              final id = state.pathParameters['emergencyId'] ?? '';
-              return LiveTrackingScreen(emergencyId: id);
-            },
+            path: '/map',
+            name: AppRouteNames.map,
+            builder: (context, state) => const SafetyMapScreen(),
           ),
           GoRoute(
-            path: 'first-aid',
+            path: '/first-aid',
             name: AppRouteNames.firstAid,
             builder: (context, state) => const FirstAidScreen(),
           ),
           GoRoute(
-            path: 'chat/:emergencyId',
-            name: AppRouteNames.emergencyChat,
-            builder: (context, state) {
-              final id = state.pathParameters['emergencyId'] ?? '';
-              return ChatScreen(emergencyId: id);
-            },
-          ),
-          GoRoute(
-            path: 'feedback/:emergencyId/:responderId',
-            name: AppRouteNames.emergencyFeedback,
-            builder: (context, state) {
-              final id = state.pathParameters['emergencyId'] ?? '';
-              final responderId = state.pathParameters['responderId'] ?? '';
-              return FeedbackScreen(emergencyId: id, responderId: responderId);
-            },
-          ),
-          GoRoute(
-            path: 'history',
-            name: AppRouteNames.emergencyHistory,
-            builder: (context, state) => const EmergencyHistoryScreen(),
-          ),
-          GoRoute(
-            path: 'notifications',
-            name: AppRouteNames.notifications,
-            builder: (context, state) => const NotificationCenterScreen(),
+            path: '/profile',
+            name: AppRouteNames.profile,
+            builder: (context, state) => const ProfileScreen(),
           ),
         ],
+      ),
+
+      // Other Citizen Screens (Full Screen)
+      GoRoute(
+        path: '/request',
+        name: AppRouteNames.emergencyRequest,
+        builder: (context, state) {
+          final type = state.extra as EmergencyType?;
+          return RequestScreen(initialType: type);
+        },
+      ),
+      GoRoute(
+        path: '/tracking/:emergencyId',
+        name: AppRouteNames.emergencyTracking,
+        builder: (context, state) {
+          final id = state.pathParameters['emergencyId'] ?? '';
+          return LiveTrackingScreen(emergencyId: id);
+        },
+      ),
+      GoRoute(
+        path: '/chat/:emergencyId',
+        name: AppRouteNames.emergencyChat,
+        builder: (context, state) {
+          final id = state.pathParameters['emergencyId'] ?? '';
+          return ChatScreen(emergencyId: id);
+        },
+      ),
+      GoRoute(
+        path: '/feedback/:emergencyId/:responderId',
+        name: AppRouteNames.emergencyFeedback,
+        builder: (context, state) {
+          final id = state.pathParameters['emergencyId'] ?? '';
+          final responderId = state.pathParameters['responderId'] ?? '';
+          return FeedbackScreen(emergencyId: id, responderId: responderId);
+        },
+      ),
+      GoRoute(
+        path: '/history',
+        name: AppRouteNames.emergencyHistory,
+        builder: (context, state) => const EmergencyHistoryScreen(),
+      ),
+      GoRoute(
+        path: '/notifications',
+        name: AppRouteNames.notifications,
+        builder: (context, state) => const NotificationCenterScreen(),
+      ),
+      GoRoute(
+        path: '/first-aid/:title',
+        name: AppRouteNames.firstAidDetail,
+        builder: (context, state) {
+          final title = state.pathParameters['title'] ?? '';
+          return FirstAidDetailScreen(title: title);
+        },
       ),
 
       // Responder Flow
@@ -166,23 +197,21 @@ class AppRouter {
         ],
       ),
 
-      // System Routes (Minimal placeholders for real feel)
+      // System Routes & Subroutes (Full Screen)
       GoRoute(
-        path: '/profile',
-        name: AppRouteNames.profile,
-        builder: (context, state) => const ProfileScreen(),
-        routes: [
-          GoRoute(
-            path: 'edit',
-            name: AppRouteNames.editProfile,
-            builder: (context, state) => const EditProfileScreen(),
-          ),
-          GoRoute(
-            path: 'contacts',
-            name: AppRouteNames.emergencyContacts,
-            builder: (context, state) => const EmergencyContactsScreen(),
-          ),
-        ],
+        path: '/profile/edit',
+        name: AppRouteNames.editProfile,
+        builder: (context, state) => const EditProfileScreen(),
+      ),
+      GoRoute(
+        path: '/profile/medical',
+        name: AppRouteNames.medicalProfile,
+        builder: (context, state) => const MedicalProfileScreen(),
+      ),
+      GoRoute(
+        path: '/profile/contacts',
+        name: AppRouteNames.emergencyContacts,
+        builder: (context, state) => const EmergencyContactsScreen(),
       ),
       GoRoute(
         path: '/settings',

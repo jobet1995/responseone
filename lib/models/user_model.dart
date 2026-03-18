@@ -107,6 +107,18 @@ class UserModel {
   /// List of emergency IDs assigned to this user (If they are a responder).
   final List<String> assignedEmergencyIds;
 
+  /// Whether the user has opted in as a volunteer.
+  final bool isVolunteer;
+
+  /// Current status of the volunteer ('Active' or 'Inactive').
+  final String volunteerStatus;
+
+  /// Skills provided by the volunteer (e.g., 'CPR', 'First Aid').
+  final String skills;
+
+  /// URL for the user's profile picture.
+  final String avatarUrl;
+
   const UserModel({
     required this.id,
     required this.username,
@@ -119,6 +131,10 @@ class UserModel {
     required this.updatedAt,
     this.location,
     this.assignedEmergencyIds = const [],
+    this.isVolunteer = false,
+    this.volunteerStatus = 'Inactive',
+    this.skills = '',
+    this.avatarUrl = '',
   });
 
   /// Factory to create a [UserModel] from a Map (JSON).
@@ -143,6 +159,10 @@ class UserModel {
       assignedEmergencyIds: List<String>.from(
         map['assigned_emergency_ids'] ?? map['assignedEmergencyIds'] ?? []
       ),
+      isVolunteer: map['is_volunteer'] ?? map['isVolunteer'] ?? false,
+      volunteerStatus: map['volunteer_status'] ?? map['volunteerStatus'] ?? 'Inactive',
+      skills: map['skills'] ?? '',
+      avatarUrl: map['avatar_url'] ?? map['avatarUrl'] ?? '',
     );
   }
 
@@ -160,6 +180,10 @@ class UserModel {
       'updated_at': updatedAt.toIso8601String(),
       'location': location?.toMap(),
       'assigned_emergency_ids': assignedEmergencyIds,
+      'is_volunteer': isVolunteer,
+      'volunteer_status': volunteerStatus,
+      'skills': skills,
+      'avatar_url': avatarUrl,
     };
   }
 
@@ -174,6 +198,10 @@ class UserModel {
     DateTime? updatedAt,
     LocationCoordinate? location,
     List<String>? assignedEmergencyIds,
+    bool? isVolunteer,
+    String? volunteerStatus,
+    String? skills,
+    String? avatarUrl,
   }) {
     return UserModel(
       id: id,
@@ -187,6 +215,10 @@ class UserModel {
       updatedAt: updatedAt ?? this.updatedAt,
       location: location ?? this.location,
       assignedEmergencyIds: assignedEmergencyIds ?? this.assignedEmergencyIds,
+      isVolunteer: isVolunteer ?? this.isVolunteer,
+      volunteerStatus: volunteerStatus ?? this.volunteerStatus,
+      skills: skills ?? this.skills,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
     );
   }
 
