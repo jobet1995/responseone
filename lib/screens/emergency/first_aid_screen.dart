@@ -1,70 +1,70 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/themes.dart';
 import '../../config/routes.dart';
+import '../../providers/first_aid_provider.dart';
+import '../../models/first_aid_tip_model.dart';
 
-class FirstAidScreen extends StatelessWidget {
+class FirstAidScreen extends ConsumerWidget {
   const FirstAidScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tipsAsync = ref.watch(firstAidTipsProvider);
+
     return Scaffold(
       appBar: AppBar(title: const Text('First Aid Guide')),
-      body: ListView(
-        padding: const EdgeInsets.all(AppTheme.defaultPadding),
-        children: [
-          _buildCategory(
-            context,
-            'Basic Life Support',
-            [
-              _buildGuideItem(context, 'CPR', 'Push hard and fast in the center of the chest.'),
-              _buildGuideItem(context, 'Choking', 'Perform abdominal thrusts (Heimlich maneuver).'),
-            ],
-            Icons.favorite,
-            Colors.red,
-          ),
-          const SizedBox(height: 24),
-          _buildCategory(
-            context,
-            'Injury & Trauma',
-            [
-              _buildGuideItem(context, 'Heavy Bleeding', 'Apply direct pressure to the wound.'),
-              _buildGuideItem(context, 'Burns', 'Cool the burn with cool (not cold) running water.'),
-              _buildGuideItem(context, 'Fractures', 'Keep the injured area still and supported.'),
-            ],
-            Icons.healing,
-            Colors.orange,
-          ),
-          const SizedBox(height: 24),
-          _buildCategory(
-            context,
-            'Medical Emergencies',
-            [
-              _buildGuideItem(context, 'Seizures', 'Clear the area and protect the person\'s head.'),
-              _buildGuideItem(context, 'Heart Attack', 'Have the person sit down and stay calm.'),
-              _buildGuideItem(context, 'Stroke', 'Think F.A.S.T (Face, Arms, Speech, Time).'),
-            ],
-            Icons.medical_services,
-            Colors.blue,
-          ),
-        ],
+      body: tipsAsync.when(
+        data: (tips) {
+          final categories = _groupTipsByCategory(tips);
+          
+          return ListView(
+            padding: const EdgeInsets.all(AppTheme.defaultPadding),
+            children: categories.entries.map((entry) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 24),
+                child: _buildCategory(
+                  context,
+                  entry.key,
+                  entry.value,
+                ),
+              );
+            }).toList(),
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, st) => Center(child: Text('Error: $e')),
       ),
     );
+  }
+
+  Map<String, List<FirstAidTip>> _groupTipsByCategory(List<FirstAidTip> tips) {
+    final Map<String, List<FirstAidTip>> map = {};
+    for (var tip in tips) {
+      if (!map.containsKey(tip.category)) {
+        map[tip.category] = [];
+      }
+      map[tip.category]!.add(tip);
+    }
+    return map;
   }
 
   Widget _buildCategory(
     BuildContext context,
     String title,
-    List<Widget> items,
-    IconData icon,
-    Color color,
+    List<FirstAidTip> items,
   ) {
+    // Determine icon and color based on title (or take from first item)
+    final firstItem = items.first;
+    final color = Color(firstItem.colorValue);
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Icon(icon, color: color),
+            Icon(_getIconData(firstItem.iconName), color: color),
             const SizedBox(width: 8),
             Text(
               title,
@@ -76,23 +76,33 @@ class FirstAidScreen extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
-        ...items,
+        ...items.map((tip) => _buildGuideItem(context, tip)).toList(),
       ],
     );
   }
 
-  Widget _buildGuideItem(BuildContext context, String title, String description) {
+  Widget _buildGuideItem(BuildContext context, FirstAidTip tip) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text(description),
+        title: Text(tip.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text(tip.description),
         trailing: const Icon(Icons.chevron_right),
         onTap: () => context.pushNamed(
           AppRouteNames.firstAidDetail,
-          pathParameters: {'title': title},
+          pathParameters: {'title': tip.id}, // Navigating by ID now
         ),
       ),
     );
+  }
+
+  IconData _getIconData(String name) {
+    switch (name) {
+      case 'favorite': return Icons.favorite;
+      case 'person_search': return Icons.person_search;
+      case 'healing': return Icons.healing;
+      case 'medical_services': return Icons.medical_services;
+      default: return Icons.help_outline;
+    }
   }
 }

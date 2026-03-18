@@ -15,10 +15,31 @@ class SafetyMapScreen extends ConsumerStatefulWidget {
 class _SafetyMapScreenState extends ConsumerState<SafetyMapScreen> {
   final MapController _mapController = MapController();
 
+  String _selectedCategory = 'All';
+
   @override
   Widget build(BuildContext context) {
     final mapState = ref.watch(mapProvider);
     final userPos = mapState.userLocation;
+
+    // Filter markers based on selected category
+    List<Marker> activeDirectoryMarkers = [];
+    if (_selectedCategory == 'All') {
+      activeDirectoryMarkers = mapState.directoryMarkers;
+    } else {
+      activeDirectoryMarkers = mapState.directoryMarkers.where((m) {
+        if (m.child is! GestureDetector) return false;
+        final icon = (m.child as GestureDetector).child;
+        if (icon is! Container) return false;
+        final actualIcon = icon.child;
+        if (actualIcon is! Icon) return false;
+        
+        if (_selectedCategory == 'Hospitals') return actualIcon.icon == Icons.local_hospital;
+        if (_selectedCategory == 'Police') return actualIcon.icon == Icons.local_police;
+        if (_selectedCategory == 'Fire Stations') return actualIcon.icon == Icons.local_fire_department;
+        return false;
+      }).toList();
+    }
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -51,6 +72,7 @@ class _SafetyMapScreenState extends ConsumerState<SafetyMapScreen> {
                   urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                   userAgentPackageName: 'com.resqnow.app',
                 ),
+                MarkerLayer(markers: activeDirectoryMarkers),
                 MarkerLayer(markers: mapState.markers),
                 if (userPos != null)
                   MarkerLayer(
@@ -154,10 +176,10 @@ class _SafetyMapScreenState extends ConsumerState<SafetyMapScreen> {
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     children: [
-                      _buildFilterChip('All', true),
-                      _buildFilterChip('Hospitals', false),
-                      _buildFilterChip('Police', false),
-                      _buildFilterChip('Responders', false),
+                      _buildFilterChip('All'),
+                      _buildFilterChip('Hospitals'),
+                      _buildFilterChip('Police'),
+                      _buildFilterChip('Fire Stations'),
                     ],
                   ),
                 ),
@@ -181,13 +203,18 @@ class _SafetyMapScreenState extends ConsumerState<SafetyMapScreen> {
     );
   }
 
-  Widget _buildFilterChip(String label, bool isSelected) {
+  Widget _buildFilterChip(String label) {
+    final bool isSelected = _selectedCategory == label;
     return Container(
       margin: const EdgeInsets.only(right: 8),
       child: FilterChip(
         label: Text(label),
         selected: isSelected,
-        onSelected: (bool selected) {},
+        onSelected: (bool selected) {
+          setState(() {
+            _selectedCategory = label;
+          });
+        },
         backgroundColor: Colors.white,
         selectedColor: AppTheme.primaryRed,
         checkmarkColor: Colors.white,

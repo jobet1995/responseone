@@ -4,13 +4,20 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'app.dart';
 import 'services/notification_service.dart';
+import 'services/first_aid_service.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   try {
+    // Initialize Hive
+    await Hive.initFlutter();
+    
     // Load environment variables
     await dotenv.load(fileName: "assets/.env");
+    
+    // ... (rest of the logic)
 
     final supabaseUrl = dotenv.env['SUPABASE_URL'];
     final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'];
@@ -27,6 +34,9 @@ void main() async {
 
     // Initialize notification service (now safe to access Supabase)
     await NotificationService.instance.initialize();
+    
+    // Initialize First Aid Service (Offline Cache)
+    await FirstAidService.instance.init();
     
     runApp(
       const ProviderScope(
