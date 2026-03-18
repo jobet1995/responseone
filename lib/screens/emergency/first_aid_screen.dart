@@ -14,7 +14,21 @@ class FirstAidScreen extends ConsumerWidget {
     final tipsAsync = ref.watch(firstAidTipsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('First Aid Guide')),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new, color: AppTheme.textPrimary, size: 20),
+            onPressed: () => context.pop(),
+          ),
+        ),
+      ),
       body: tipsAsync.when(
         data: (tips) {
           final categories = _groupTipsByCategory(tips);

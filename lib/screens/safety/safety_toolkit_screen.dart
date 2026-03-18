@@ -50,8 +50,25 @@ class _SafetyToolkitScreenState extends State<SafetyToolkitScreen> {
       if (_isSirenActive) {
         await _audioPlayer.stop();
       } else {
-        // Using a reliable public siren sound URL
-        await _audioPlayer.play(UrlSource('https://www.soundjay.com/buttons/sounds/beep-01a.mp3'));
+        // Set audio context for loud playback on physical devices
+        await _audioPlayer.setAudioContext(AudioContext(
+          android: const AudioContextAndroid(
+            usageType: AndroidUsageType.alarm,
+            contentType: AndroidContentType.music,
+            audioFocus: AndroidAudioFocus.gainTransient,
+          ),
+          iOS: AudioContextIOS(
+            category: AVAudioSessionCategory.playback,
+            options: const {
+              AVAudioSessionOptions.defaultToSpeaker,
+              AVAudioSessionOptions.mixWithOthers,
+            },
+          ),
+        ));
+
+        // Using a robust direct raw URL from a GitHub sample repo
+        const sirenUrl = 'https://raw.githubusercontent.com/rafaelbarbosatec/audioplayers/main/packages/audioplayers/example/assets/audio.mp3';
+        await _audioPlayer.play(UrlSource(sirenUrl));
       }
       
       setState(() => _isSirenActive = !_isSirenActive);
@@ -66,6 +83,14 @@ class _SafetyToolkitScreenState extends State<SafetyToolkitScreen> {
       }
     } catch (e) {
       debugPrint('Siren Error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not play siren. Check your internet or audio permissions.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -200,8 +225,14 @@ class _SafetyToolkitScreenState extends State<SafetyToolkitScreen> {
               color: Colors.blue,
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Fake Call feature coming soon!')),
+                  const SnackBar(
+                    content: Text('Simulated call incoming in 5 seconds...'),
+                    duration: Duration(seconds: 3),
+                  ),
                 );
+                Future.delayed(const Duration(seconds: 5), () {
+                  if (mounted) context.push('/fake-call');
+                });
               },
             ),
             _buildActionTile(
@@ -209,14 +240,14 @@ class _SafetyToolkitScreenState extends State<SafetyToolkitScreen> {
               subtitle: 'Send real-time GPS to trusted contacts.',
               icon: Icons.share_location_rounded,
               color: Colors.green,
-              onTap: () => context.push('/profile/contacts'),
+              onTap: () => context.push('/share-location'),
             ),
             _buildActionTile(
               title: 'Walk With Me',
               subtitle: 'Keep a responder on the line until you reach home.',
               icon: Icons.directions_walk_rounded,
               color: Colors.purple,
-              onTap: () => context.push('/request', extra: EmergencyType.other),
+              onTap: () => context.push('/request', extra: EmergencyType.walkWithMe),
             ),
             const SizedBox(height: 48),
             Container(

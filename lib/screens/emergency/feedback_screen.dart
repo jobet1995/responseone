@@ -83,10 +83,14 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Rating & Feedback'),
-        backgroundColor: Colors.white,
-        foregroundColor: AppTheme.textPrimary,
+        backgroundColor: AppTheme.primaryRed,
+        foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new),
+          onPressed: () => context.go('/home'),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),

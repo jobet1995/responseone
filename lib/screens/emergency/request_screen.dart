@@ -60,7 +60,15 @@ class _RequestScreenState extends ConsumerState<RequestScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Report Emergency')),
+      appBar: AppBar(
+        title: Text(_selectedType == EmergencyType.walkWithMe ? 'Walk With Me' : 'Report Emergency'),
+        backgroundColor: AppTheme.primaryRed,
+        foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppTheme.defaultPadding * 1.5),
         child: Column(
@@ -105,8 +113,10 @@ class _RequestScreenState extends ConsumerState<RequestScreen> {
             TextField(
               controller: _descriptionController,
               maxLines: 4,
-              decoration: const InputDecoration(
-                hintText: 'e.g., Someone fell unconscious, fire in the kitchen...',
+              decoration: InputDecoration(
+                hintText: _selectedType == EmergencyType.walkWithMe 
+                  ? 'e.g., Walking home from the station, taking a taxi...' 
+                  : 'e.g., Someone fell unconscious, fire in the kitchen...',
                 alignLabelWithHint: true,
               ),
             ),
@@ -133,7 +143,7 @@ class _RequestScreenState extends ConsumerState<RequestScreen> {
             ),
             const SizedBox(height: 48),
             CustomButton(
-              text: 'REQUEST IMMEDIATE HELP',
+              text: _selectedType == EmergencyType.walkWithMe ? 'START MONITORING' : 'REQUEST IMMEDIATE HELP',
               onPressed: _handleSubmit,
               isLoading: _isSubmitting,
               backgroundColor: AppTheme.primaryRed,

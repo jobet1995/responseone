@@ -8,6 +8,7 @@ enum EmergencyType {
   fire('Fire'),
   police('Police'),
   mentalHealth('Mental Health'),
+  walkWithMe('Walk With Me'),
   other('Other');
 
   final String value;

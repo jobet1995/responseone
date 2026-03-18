@@ -29,15 +29,20 @@ class _EmergencyHistoryScreenState extends ConsumerState<EmergencyHistoryScreen>
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: const Text('Incident History'),
-        backgroundColor: Colors.white,
-        foregroundColor: AppTheme.textPrimary,
-        elevation: 0,
+        backgroundColor: AppTheme.primaryRed,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new),
+          onPressed: () => context.pop(),
+        ),
         bottom: TabBar(
           controller: _tabController,
-          isScrollable: true,
-          labelColor: AppTheme.primaryRed,
-          unselectedLabelColor: AppTheme.textSecondary,
-          indicatorColor: AppTheme.primaryRed,
+          isScrollable: false,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white.withValues(alpha: 0.7),
+          indicatorColor: Colors.white,
+          indicatorWeight: 3,
           tabs: const [
             Tab(text: 'All'),
             Tab(text: 'Pending'),

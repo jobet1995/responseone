@@ -42,9 +42,13 @@ class _NotificationCenterScreenState extends ConsumerState<NotificationCenterScr
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: const Text('Notifications'),
-        backgroundColor: Colors.white,
-        foregroundColor: AppTheme.textPrimary,
+        backgroundColor: AppTheme.primaryRed,
+        foregroundColor: Colors.white,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         actions: [
           if (_notifications.any((n) => !n.isRead))
             TextButton(

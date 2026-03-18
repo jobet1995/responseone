@@ -29,6 +29,9 @@ import '../screens/onboarding/onboarding_screen.dart';
 import '../screens/safety/safety_toolkit_screen.dart';
 import '../screens/safety/preparedness_screen.dart';
 import '../screens/safety/weather_alert_screen.dart';
+import '../screens/safety/fake_call_screen.dart';
+import '../screens/safety/in_call_screen.dart';
+import '../screens/safety/share_location_screen.dart';
 import '../models/emergency_model.dart';
 
 /// Route constants for the ResQNow application.
@@ -63,6 +66,9 @@ class AppRouteNames {
   static const String about = 'about';
   static const String notifications = 'notifications';
   static const String weatherAlert = 'weather_alert';
+  static const String fakeCall = 'fake_call';
+  static const String inCall = 'in_call';
+  static const String shareLocation = 'share_location';
 }
 
 class AppRouter {
@@ -186,6 +192,27 @@ class AppRouter {
         path: '/weather-alert',
         name: AppRouteNames.weatherAlert,
         builder: (context, state) => const WeatherAlertScreen(),
+      ),
+      GoRoute(
+        path: '/fake-call',
+        name: AppRouteNames.fakeCall,
+        builder: (context, state) => const FakeCallScreen(),
+      ),
+      GoRoute(
+        path: '/in-call',
+        name: AppRouteNames.inCall,
+        builder: (context, state) {
+          final data = state.extra as Map<String, dynamic>? ?? {};
+          return InCallScreen(
+            name: data['name'] ?? 'Emergency Dispatch',
+            number: data['number'] ?? '+1 (555) 0199',
+          );
+        },
+      ),
+      GoRoute(
+        path: '/share-location',
+        name: AppRouteNames.shareLocation,
+        builder: (context, state) => const ShareLocationScreen(),
       ),
       GoRoute(
         path: '/first-aid/:title',

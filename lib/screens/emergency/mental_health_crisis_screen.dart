@@ -94,6 +94,10 @@ class _MentalHealthCrisisScreenState extends ConsumerState<MentalHealthCrisisScr
         title: const Text('Mental Health Support'),
         backgroundColor: Colors.purple,
         foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppTheme.defaultPadding * 1.5),

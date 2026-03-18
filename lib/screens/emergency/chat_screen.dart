@@ -64,6 +64,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         title: const Text('Emergency Chat'),
         backgroundColor: AppTheme.primaryRed,
         foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       body: Column(
         children: [

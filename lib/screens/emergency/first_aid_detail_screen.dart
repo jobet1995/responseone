@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../config/themes.dart';
 import '../../providers/first_aid_provider.dart';
 
@@ -20,7 +21,17 @@ class FirstAidDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: AppTheme.textPrimary),
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new, color: AppTheme.textPrimary, size: 20),
+            onPressed: () => context.pop(),
+          ),
+        ),
       ),
       body: tipAsync.when(
         data: (tip) {

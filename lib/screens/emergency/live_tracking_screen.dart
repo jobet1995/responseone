@@ -17,7 +17,15 @@ class LiveTrackingScreen extends ConsumerWidget {
     final emergencyState = ref.watch(emergencyHistoryProvider);
     
     return Scaffold(
-      appBar: AppBar(title: const Text('Live Tracking')),
+      appBar: AppBar(
+        title: const Text('Live Tracking'),
+        backgroundColor: AppTheme.primaryRed,
+        foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
       body: emergencyState.when(
         data: (history) {
           final emergency = history.firstWhere(

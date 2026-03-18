@@ -125,6 +125,10 @@ class EmergencyCard extends StatelessWidget {
         iconData = Icons.psychology;
         color = Colors.purple;
         break;
+      case EmergencyType.walkWithMe:
+        iconData = Icons.directions_walk;
+        color = Colors.blueAccent;
+        break;
       case EmergencyType.other:
         iconData = Icons.report_problem;
         color = Colors.grey;
