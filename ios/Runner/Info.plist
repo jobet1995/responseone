@@ -72,5 +72,9 @@
 	<string>ResQNow needs access to your camera so you can take a profile photo.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>ResQNow needs access to your microphone if you record a video message.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>ResQNow needs access to your location to provide emergency assistance and track your position in real-time during an active incident.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>ResQNow needs access to your location to ensure you receive timely help and can be tracked by responders during an emergency.</string>
 </dict>
 </plist>
