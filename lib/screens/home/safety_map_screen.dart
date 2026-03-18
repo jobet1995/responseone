@@ -24,7 +24,7 @@ class _SafetyMapScreenState extends ConsumerState<SafetyMapScreen> {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text('Safety Map'),
-        backgroundColor: Colors.white.withOpacity(0.8),
+        backgroundColor: Colors.white.withValues(alpha: 0.8),
         elevation: 0,
         actions: [
           IconButton(
@@ -40,8 +40,11 @@ class _SafetyMapScreenState extends ConsumerState<SafetyMapScreen> {
             child: FlutterMap(
               mapController: _mapController,
               options: MapOptions(
-                initialCenter: LatLng(userPos?.latitude ?? 0, userPos?.longitude ?? 0),
-                initialZoom: 14.0,
+                initialCenter: LatLng(
+                  userPos?.latitude ?? MapState.defaultLocation.latitude,
+                  userPos?.longitude ?? MapState.defaultLocation.longitude,
+                ),
+                initialZoom: userPos == null ? 10.0 : 14.0,
               ),
               children: [
                 TileLayer(
@@ -49,12 +52,68 @@ class _SafetyMapScreenState extends ConsumerState<SafetyMapScreen> {
                   userAgentPackageName: 'com.resqnow.app',
                 ),
                 MarkerLayer(markers: mapState.markers),
+                if (userPos != null)
+                  MarkerLayer(
+                    markers: [
+                      Marker(
+                        point: LatLng(userPos.latitude, userPos.longitude),
+                        width: 40,
+                        height: 40,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.blue.withValues(alpha: 0.3),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 2),
+                          ),
+                          child: const Icon(Icons.person_pin_circle, color: Colors.blue, size: 30),
+                        ),
+                      ),
+                    ],
+                  ),
               ],
             ),
           ),
           
           if (mapState.isLoading)
-            const Center(child: CircularProgressIndicator()),
+            Container(
+              color: Colors.white.withValues(alpha: 0.5),
+              child: const Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(color: AppTheme.primaryRed),
+                    SizedBox(height: 16),
+                    Text('Fetching your location...', style: TextStyle(fontWeight: FontWeight.w500)),
+                  ],
+                ),
+              ),
+            ),
+
+          if (userPos == null && !mapState.isLoading)
+            Positioned(
+              bottom: 100,
+              left: 20,
+              right: 20,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.7),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.location_off, color: Colors.white, size: 20),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Location unavailable. Showing default map.',
+                        style: TextStyle(color: Colors.white, fontSize: 13),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
 
           // Search and Filter Overlay
           SafeArea(
@@ -69,7 +128,7 @@ class _SafetyMapScreenState extends ConsumerState<SafetyMapScreen> {
                       borderRadius: BorderRadius.circular(30),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withValues(alpha: 0.1),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import '../../providers/map_provider.dart';
 import '../../providers/emergency_provider.dart';
 import '../../config/themes.dart';
 import '../../widgets/status_chip.dart';
@@ -30,8 +31,8 @@ class LiveTrackingScreen extends ConsumerWidget {
                 child: FlutterMap(
                   options: MapOptions(
                     initialCenter: LatLng(
-                      emergency.location.latitude,
-                      emergency.location.longitude,
+                      emergency.location.latitude == 0 ? MapState.defaultLocation.latitude : emergency.location.latitude,
+                      emergency.location.longitude == 0 ? MapState.defaultLocation.longitude : emergency.location.longitude,
                     ),
                     initialZoom: 15.0,
                   ),
@@ -44,8 +45,8 @@ class LiveTrackingScreen extends ConsumerWidget {
                       markers: [
                         Marker(
                           point: LatLng(
-                            emergency.location.latitude,
-                            emergency.location.longitude,
+                            emergency.location.latitude == 0 ? MapState.defaultLocation.latitude : emergency.location.latitude,
+                            emergency.location.longitude == 0 ? MapState.defaultLocation.longitude : emergency.location.longitude,
                           ),
                           width: 40,
                           height: 40,
