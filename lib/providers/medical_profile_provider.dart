@@ -27,13 +27,13 @@ class MedicalProfileNotifier extends Notifier<AsyncValue<MedicalProfileModel?>> 
 
   Future<bool> updateProfile(MedicalProfileModel profile) async {
     try {
-      final success = await MedicalProfileService.instance.updateMedicalProfile(profile);
-      if (success) {
-        state = AsyncValue.data(profile);
+      final updatedProfile = await MedicalProfileService.instance.updateMedicalProfile(profile);
+      if (updatedProfile != null) {
+        state = AsyncValue.data(updatedProfile);
         return true;
       }
     } catch (e) {
-      print('Update Profile Error: $e');
+      // Error is logged in the service
     }
     return false;
   }

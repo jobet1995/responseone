@@ -56,8 +56,10 @@ class _MedicalProfileScreenState extends ConsumerState<MedicalProfileScreen> {
     final user = ref.read(currentUserProvider).value;
     if (user == null) return;
 
+    final existingProfile = ref.read(medicalProfileProvider).value;
+    
     final profile = MedicalProfileModel(
-      id: '', // Service handles id/upsert
+      id: existingProfile?.id ?? '', // Preserve existing ID
       userId: user.id,
       bloodType: _bloodTypeController.text,
       allergies: _allergiesController.text,

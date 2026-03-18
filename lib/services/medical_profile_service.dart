@@ -23,18 +23,24 @@ class MedicalProfileService {
     }
   }
 
-  Future<bool> updateMedicalProfile(MedicalProfileModel profile) async {
+  Future<MedicalProfileModel?> updateMedicalProfile(MedicalProfileModel profile) async {
     try {
       final data = profile.toMap();
-      data.remove('id'); // Let DB/Primary Key handle it if new, or eq(id) handle it if update
+      if (profile.id.isEmpty) {
+        data.remove('id');
+      }
       
-      await _supabase
+      final response = await _supabase
           .from('medical_profiles')
-          .upsert(data, onConflict: 'user_id');
-      return true;
+          .upsert(data, onConflict: 'user_id')
+          .select()
+          .single();
+          
+      return MedicalProfileModel.fromMap(response);
     } catch (e) {
+      // ignore: avoid_print
       print('Update Medical Profile Error: $e');
-      return false;
+      return null;
     }
   }
 }
