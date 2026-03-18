@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong2.dart';
 import '../../providers/emergency_provider.dart';
 import '../../config/themes.dart';
 import '../../widgets/status_chip.dart';
@@ -25,19 +27,37 @@ class LiveTrackingScreen extends ConsumerWidget {
           return Column(
             children: [
               Expanded(
-                child: Container(
-                  color: Colors.grey[200],
-                  child: const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.map, size: 80, color: Colors.grey),
-                        SizedBox(height: 16),
-                        Text('Map View Placeholder'),
-                        Text('Integrating with Google Maps...'),
+                child: FlutterMap(
+                  options: MapOptions(
+                    initialCenter: LatLng(
+                      emergency.location.latitude,
+                      emergency.location.longitude,
+                    ),
+                    initialZoom: 15.0,
+                  ),
+                  children: [
+                    TileLayer(
+                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      userAgentPackageName: 'com.resqnow.app',
+                    ),
+                    MarkerLayer(
+                      markers: [
+                        Marker(
+                          point: LatLng(
+                            emergency.location.latitude,
+                            emergency.location.longitude,
+                          ),
+                          width: 40,
+                          height: 40,
+                          child: const Icon(
+                            Icons.location_on,
+                            color: Colors.red,
+                            size: 35,
+                          ),
+                        ),
                       ],
                     ),
-                  ),
+                  ],
                 ),
               ),
               _buildStatusPanel(context, emergency),

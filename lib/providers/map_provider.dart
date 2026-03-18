@@ -1,23 +1,25 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong2.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/user_model.dart';
 import '../services/location_service.dart';
 import 'dart:async';
 
 class MapState {
-  final Set<Marker> markers;
+  final List<Marker> markers;
   final LocationCoordinate? userLocation;
   final bool isLoading;
 
   MapState({
-    this.markers = const {},
+    this.markers = const [],
     this.userLocation,
     this.isLoading = false,
   });
 
   MapState copyWith({
-    Set<Marker>? markers,
+    List<Marker>? markers,
     LocationCoordinate? userLocation,
     bool? isLoading,
   }) {
@@ -69,10 +71,14 @@ class MapNotifier extends Notifier<MapState> {
         
         newMarkers.add(
           Marker(
-            markerId: MarkerId('responder_${data['id']}'),
-            position: LatLng(lat, lng),
-            infoWindow: InfoWindow(title: '${data['name']} (${data['type']})'),
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+            point: LatLng(lat, lng),
+            width: 40,
+            height: 40,
+            child: const Icon(
+              Icons.directions_car,
+              color: Colors.blue,
+              size: 30,
+            ),
           ),
         );
       }
@@ -91,15 +97,19 @@ class MapNotifier extends Notifier<MapState> {
 
         newMarkers.add(
           Marker(
-            markerId: MarkerId('emergency_${data['id']}'),
-            position: LatLng(lat, lng),
-            infoWindow: InfoWindow(title: '${data['type']} Emergency'),
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+            point: LatLng(lat, lng),
+            width: 40,
+            height: 40,
+            child: const Icon(
+              Icons.location_on,
+              color: Colors.red,
+              size: 35,
+            ),
           ),
         );
       }
 
-      state = state.copyWith(markers: newMarkers.toSet());
+      state = state.copyWith(markers: newMarkers);
     } catch (e) {
       print('Error fetching map markers: $e');
     }

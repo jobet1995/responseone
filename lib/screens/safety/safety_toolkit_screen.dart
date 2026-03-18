@@ -1,5 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:torch_light/torch_light.dart';
 import '../../config/themes.dart';
 import '../../models/emergency_model.dart';
 
@@ -13,27 +16,124 @@ class SafetyToolkitScreen extends StatefulWidget {
 class _SafetyToolkitScreenState extends State<SafetyToolkitScreen> {
   bool _isSirenActive = false;
   bool _isFlashActive = false;
+  
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  Timer? _sosTimer;
+  int _sosIndex = 0;
+  
+  // SOS Morse Code Pulse Durations (ms)
+  // S: . . . (short pulses)
+  // O: - - - (long pulses)
+  // S: . . .
+  final List<int> _sosPattern = [
+    200, 200, 200, 200, 200, 600, // S
+    600, 200, 600, 200, 600, 600, // O
+    200, 200, 200, 200, 200, 1000 // S
+  ];
 
-  void _toggleSiren() {
-    setState(() => _isSirenActive = !_isSirenActive);
-    // In a real app: ref.read(soundServiceProvider).playSiren();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(_isSirenActive ? 'Siren Activated' : 'Siren Deactivated'),
-        duration: const Duration(seconds: 1),
-      ),
-    );
+  @override
+  void initState() {
+    super.initState();
+    _audioPlayer.setReleaseMode(ReleaseMode.loop);
   }
 
-  void _toggleFlash() {
-    setState(() => _isFlashActive = !_isFlashActive);
-    // In a real app: ref.read(flashServiceProvider).toggleSosPattern();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(_isFlashActive ? 'SOS Flashlight Activated' : 'Flashlight Deactivated'),
-        duration: const Duration(seconds: 1),
-      ),
-    );
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    _sosTimer?.cancel();
+    _stopFlashlight();
+    super.dispose();
+  }
+
+  Future<void> _toggleSiren() async {
+    try {
+      if (_isSirenActive) {
+        await _audioPlayer.stop();
+      } else {
+        // Using a reliable public siren sound URL
+        await _audioPlayer.play(UrlSource('https://www.soundjay.com/buttons/sounds/beep-01a.mp3'));
+      }
+      
+      setState(() => _isSirenActive = !_isSirenActive);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_isSirenActive ? 'Siren Activated' : 'Siren Deactivated'),
+            duration: const Duration(seconds: 1),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Siren Error: $e');
+    }
+  }
+
+  Future<void> _toggleFlash() async {
+    try {
+      final isTorchAvailable = await TorchLight.isTorchAvailable();
+      if (!isTorchAvailable) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Flashlight not available on this device')),
+          );
+        }
+        return;
+      }
+
+      if (_isFlashActive) {
+        setState(() => _isFlashActive = false);
+        _stopSosFlash();
+      } else {
+        setState(() => _isFlashActive = true);
+        _startSosFlash();
+      }
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_isFlashActive ? 'SOS Flashlight Activated' : 'Flashlight Deactivated'),
+            duration: const Duration(seconds: 1),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Flashlight Error: $e');
+    }
+  }
+
+  void _startSosFlash() {
+    _sosIndex = 0;
+    _nextSosStep();
+  }
+
+  void _stopSosFlash() {
+    _sosTimer?.cancel();
+    _stopFlashlight();
+  }
+
+  Future<void> _stopFlashlight() async {
+    try {
+      await TorchLight.disableTorch();
+    } catch (_) {}
+  }
+
+  void _nextSosStep() {
+    if (!_isFlashActive) return;
+
+    final bool isOn = _sosIndex % 2 == 0;
+    final int duration = _sosPattern[_sosIndex % _sosPattern.length];
+
+    if (isOn) {
+      TorchLight.enableTorch();
+    } else {
+      TorchLight.disableTorch();
+    }
+
+    _sosTimer = Timer(Duration(milliseconds: duration), () {
+      _sosIndex++;
+      _nextSosStep();
+    });
   }
 
   @override
