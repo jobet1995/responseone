@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'dart:convert';
 import 'user_model.dart'; // For LocationCoordinate
 
 /// Defines the types of emergencies supported by the system.
@@ -97,26 +98,26 @@ class EmergencyModel {
   factory EmergencyModel.fromMap(Map<String, dynamic> map) {
     return EmergencyModel(
       id: map['id'] ?? '',
-      citizenId: map['citizenId'] ?? '',
-      responderId: map['responderId'] as String?,
+      citizenId: map['citizen_id'] ?? map['citizenId'] ?? '',
+      responderId: (map['responder_id'] ?? map['responderId']) as String?,
       type: EmergencyType.fromString(map['type']),
       status: EmergencyStatus.fromString(map['status']),
       description: map['description'] ?? '',
       location: map['location'] != null 
-          ? LocationCoordinate.fromMap(map['location']) 
+          ? LocationCoordinate.fromMap(map['location'] is String ? jsonDecode(map['location']) : map['location']) 
           : const LocationCoordinate(latitude: 0, longitude: 0),
-      mediaUrls: List<String>.from(map['mediaUrls'] ?? []),
-      createdAt: map['createdAt'] != null 
-          ? DateTime.parse(map['createdAt']) 
+      mediaUrls: List<String>.from(map['media_urls'] ?? map['mediaUrls'] ?? []),
+      createdAt: (map['created_at'] != null || map['createdAt'] != null)
+          ? DateTime.parse(map['created_at'] ?? map['createdAt'])
           : DateTime.now(),
-      updatedAt: map['updatedAt'] != null 
-          ? DateTime.parse(map['updatedAt']) 
+      updatedAt: (map['updated_at'] != null || map['updatedAt'] != null)
+          ? DateTime.parse(map['updated_at'] ?? map['updatedAt'])
           : DateTime.now(),
-      assignedAt: map['assignedAt'] != null 
-          ? DateTime.parse(map['assignedAt']) 
+      assignedAt: (map['assigned_at'] ?? map['assignedAt']) != null 
+          ? DateTime.parse(map['assigned_at'] ?? map['assignedAt']) 
           : null,
-      completedAt: map['completedAt'] != null 
-          ? DateTime.parse(map['completedAt']) 
+      completedAt: (map['completed_at'] ?? map['completedAt']) != null 
+          ? DateTime.parse(map['completed_at'] ?? map['completedAt']) 
           : null,
     );
   }
@@ -125,17 +126,17 @@ class EmergencyModel {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'citizenId': citizenId,
-      'responderId': responderId,
+      'citizen_id': citizenId,
+      'responder_id': responderId,
       'type': type.value,
       'status': status.value,
       'description': description,
       'location': location.toMap(),
-      'mediaUrls': mediaUrls,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
-      'assignedAt': assignedAt?.toIso8601String(),
-      'completedAt': completedAt?.toIso8601String(),
+      'media_urls': mediaUrls,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      'assigned_at': assignedAt?.toIso8601String(),
+      'completed_at': completedAt?.toIso8601String(),
     };
   }
 

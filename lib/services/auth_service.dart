@@ -1,44 +1,35 @@
 import 'dart:convert';
-import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../config/constants.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../models/user_model.dart';
 
-/// Service to handle authentication (Login, Register, Logout).
+/// Service to handle authentication (Login, Register, Logout) using Supabase.
 class AuthService {
-  final Dio _dio = Dio(BaseOptions(baseUrl: ApiEndpoints.baseUrl));
+  SupabaseClient get _supabase => Supabase.instance.client;
   
-  AuthService._() {
-    // Add interceptors for token handling or logging here if needed
-    _dio.interceptors.add(InterceptorsWrapper(
-      onRequest: (options, handler) async {
-        final token = await _getToken();
-        if (token != null) {
-          options.headers['Authorization'] = 'Bearer $token';
-        }
-        return handler.next(options);
-      },
-    ));
-  }
+  AuthService._();
   
   static final AuthService instance = AuthService._();
 
-  static const String _tokenKey = 'auth_token';
   static const String _userKey = 'user_data';
+  final _storage = const FlutterSecureStorage();
 
   /// Authenticates a user with email and password.
   Future<UserModel?> login(String email, String password) async {
     try {
-      final response = await _dio.post('/auth/login', data: {
-        'email': email,
-        'password': password,
-      });
+      final response = await _supabase.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
 
-      if (response.statusCode == 200) {
-        final String token = response.data['token'];
-        final Map<String, dynamic> userData = response.data['user'];
+      if (response.user != null) {
+        // Fetch user profile from public.users table
+        final userData = await _supabase
+            .from('users')
+            .select()
+            .eq('id', response.user!.id)
+            .single();
         
-        await _saveToken(token);
         final user = UserModel.fromMap(userData);
         await _saveUser(user);
         
@@ -50,19 +41,39 @@ class AuthService {
     return null;
   }
 
-  /// Registers a new user.
-  Future<UserModel?> register(Map<String, dynamic> registrationData) async {
+  /// Registers a new user and creates a profile in the users table.
+  Future<UserModel?> register(Map<String, dynamic> data) async {
     try {
-      final response = await _dio.post('/auth/register', data: registrationData);
+      final email = data['email'] as String;
+      final password = data['password'] as String;
+      final name = data['name'] as String;
+      final phoneNumber = data['phoneNumber'] as String;
+      final role = data['role'] as String;
 
-      if (response.statusCode == 201) {
-        final String token = response.data['token'];
-        final Map<String, dynamic> userData = response.data['user'];
+      final response = await _supabase.auth.signUp(
+        email: email,
+        password: password,
+      );
+
+      if (response.user != null) {
+        final userId = response.user!.id;
         
-        await _saveToken(token);
+        // Create user profile in public.users table
+        final userData = {
+          'id': userId,
+          'name': name,
+          'email': email,
+          'phone_number': phoneNumber,
+          'role': role,
+          'status': 'Active',
+          'created_at': DateTime.now().toIso8601String(),
+          'updated_at': DateTime.now().toIso8601String(),
+        };
+
+        await _supabase.from('users').insert(userData);
+        
         final user = UserModel.fromMap(userData);
         await _saveUser(user);
-        
         return user;
       }
     } catch (e) {
@@ -73,24 +84,42 @@ class AuthService {
 
   /// Logs out the user and clears local data.
   Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_tokenKey);
-    await prefs.remove(_userKey);
+    try {
+      await _supabase.auth.signOut();
+      await _storage.delete(key: _userKey);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   /// Checks if a user is currently logged in.
   Future<bool> isLoggedIn() async {
-    final token = await _getToken();
-    return token != null;
+    return _supabase.auth.currentSession != null;
   }
 
-  /// Gets the currently logged in user from local storage.
+  /// Gets the currently logged in user.
   Future<UserModel?> getCurrentUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userJson = prefs.getString(_userKey);
+    final userJson = await _storage.read(key: _userKey);
     if (userJson != null) {
       try {
         return UserModel.fromMap(jsonDecode(userJson));
+      } catch (e) {
+        // Fallback to Supabase if local storage fails
+      }
+    }
+    
+    // If not in storage, try fetching from Supabase if session exists
+    final session = _supabase.auth.currentSession;
+    if (session != null) {
+      try {
+        final userData = await _supabase
+            .from('users')
+            .select()
+            .eq('id', session.user.id)
+            .single();
+        final user = UserModel.fromMap(userData);
+        await _saveUser(user);
+        return user;
       } catch (e) {
         return null;
       }
@@ -99,18 +128,7 @@ class AuthService {
   }
 
   // --- Storage Helpers ---
-  Future<void> _saveToken(String token) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_tokenKey, token);
-  }
-
-  Future<String?> _getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_tokenKey);
-  }
-
   Future<void> _saveUser(UserModel user) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_userKey, jsonEncode(user.toMap()));
+    await _storage.write(key: _userKey, value: jsonEncode(user.toMap()));
   }
 }

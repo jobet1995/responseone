@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../providers/user_provider.dart';
 import '../../widgets/custom_button.dart';
 import '../../config/themes.dart';
+import '../../utils/validators.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -16,6 +17,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -49,68 +51,78 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppTheme.defaultPadding * 1.5),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Icon(Icons.emergency_share, size: 80, color: AppTheme.primaryRed),
-                const SizedBox(height: 16),
-                Text(
-                  'ResQNow',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                        color: AppTheme.primaryRed,
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Emergency Response At Your Fingertips',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: AppTheme.textSecondary),
-                ),
-                const SizedBox(height: 48),
-                TextFormField(
-                  controller: _emailController,
-                  decoration: const InputDecoration(
-                    labelText: 'Email Address',
-                    prefixIcon: Icon(Icons.email_outlined),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: AppTheme.defaultPadding * 1.5),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Image.asset(
+                    'assets/images/logo.png',
+                    width: 100,
+                    height: 100,
                   ),
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (v) => v != null && v.contains('@') ? null : 'Enter a valid email',
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _passwordController,
-                  decoration: const InputDecoration(
-                    labelText: 'Password',
-                    prefixIcon: Icon(Icons.lock_outline),
+                  const SizedBox(height: 16),
+                  Text(
+                    'ResQNow',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                          color: AppTheme.primaryRed,
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
-                  obscureText: true,
-                  validator: (v) => v != null && v.length >= 6 ? null : 'Password too short',
-                ),
-                const SizedBox(height: 24),
-                CustomButton(
-                  text: 'LOGIN',
-                  onPressed: _handleLogin,
-                  isLoading: isLoading,
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("Don't have an account?"),
-                    TextButton(
-                      onPressed: () => context.push('/register'),
-                      child: const Text('Register Now'),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Emergency Response At Your Fingertips',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: AppTheme.textSecondary),
+                  ),
+                  const SizedBox(height: 48),
+                  TextFormField(
+                    controller: _emailController,
+                    decoration: const InputDecoration(
+                      labelText: 'Email Address',
+                      prefixIcon: Icon(Icons.email_outlined),
                     ),
-                  ],
-                ),
-              ],
+                    keyboardType: TextInputType.emailAddress,
+                    validator: AppValidators.validateEmail,
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _passwordController,
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      prefixIcon: const Icon(Icons.lock_outline),
+                      suffixIcon: IconButton(
+                        icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
+                        onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                      ),
+                    ),
+                    obscureText: _obscurePassword,
+                    validator: (v) => v != null && v.isNotEmpty ? null : 'Password is required',
+                  ),
+                  const SizedBox(height: 24),
+                  CustomButton(
+                    text: 'LOGIN',
+                    onPressed: _handleLogin,
+                    isLoading: isLoading,
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("Don't have an account?"),
+                      TextButton(
+                        onPressed: () => context.push('/register'),
+                        child: const Text('Register Now'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

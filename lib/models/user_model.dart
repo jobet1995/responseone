@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'dart:convert';
 
 /// Defines the roles available in the ResQNow system.
 enum UserRole {
@@ -122,19 +123,21 @@ class UserModel {
       id: map['id'] ?? '',
       name: map['name'] ?? '',
       email: map['email'] ?? '',
-      phoneNumber: map['phoneNumber'] ?? '',
+      phoneNumber: map['phone_number'] ?? map['phoneNumber'] ?? '',
       role: UserRole.fromString(map['role']),
       status: UserStatus.fromString(map['status']),
-      createdAt: map['createdAt'] != null 
-          ? DateTime.parse(map['createdAt']) 
+      createdAt: (map['created_at'] != null || map['createdAt'] != null)
+          ? DateTime.parse(map['created_at'] ?? map['createdAt'])
           : DateTime.now(),
-      updatedAt: map['updatedAt'] != null 
-          ? DateTime.parse(map['updatedAt']) 
+      updatedAt: (map['updated_at'] != null || map['updatedAt'] != null)
+          ? DateTime.parse(map['updated_at'] ?? map['updatedAt'])
           : DateTime.now(),
       location: map['location'] != null 
-          ? LocationCoordinate.fromMap(map['location']) 
+          ? LocationCoordinate.fromMap(map['location'] is String ? jsonDecode(map['location']) : map['location']) 
           : null,
-      assignedEmergencyIds: List<String>.from(map['assignedEmergencyIds'] ?? []),
+      assignedEmergencyIds: List<String>.from(
+        map['assigned_emergency_ids'] ?? map['assignedEmergencyIds'] ?? []
+      ),
     );
   }
 
@@ -144,13 +147,13 @@ class UserModel {
       'id': id,
       'name': name,
       'email': email,
-      'phoneNumber': phoneNumber,
+      'phone_number': phoneNumber,
       'role': role.value,
       'status': status.value,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
       'location': location?.toMap(),
-      'assignedEmergencyIds': assignedEmergencyIds,
+      'assigned_emergency_ids': assignedEmergencyIds,
     };
   }
 

@@ -1,10 +1,9 @@
-import 'package:dio/dio.dart';
-import '../config/constants.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/emergency_model.dart';
 
-/// Service to handle emergency reports and interactions.
+/// Service to handle emergency reports and interactions using Supabase.
 class EmergencyService {
-  final Dio _dio = Dio(BaseOptions(baseUrl: ApiEndpoints.baseUrl));
+  SupabaseClient get _supabase => Supabase.instance.client;
 
   EmergencyService._();
   
@@ -13,40 +12,41 @@ class EmergencyService {
   /// Reports a new emergency.
   Future<EmergencyModel?> createEmergency(Map<String, dynamic> emergencyData) async {
     try {
-      final response = await _dio.post(ApiEndpoints.emergencies, data: emergencyData);
+      final response = await _supabase.from('emergencies').insert({
+        ...emergencyData,
+        'created_at': DateTime.now().toIso8601String(),
+        'updated_at': DateTime.now().toIso8601String(),
+      }).select().single();
 
-      if (response.statusCode == 201) {
-        return EmergencyModel.fromMap(response.data);
-      }
+      return EmergencyModel.fromMap(response);
     } catch (e) {
       rethrow;
     }
-    return null;
   }
 
   /// Fetches a specific emergency by ID.
   Future<EmergencyModel?> getEmergencyById(String id) async {
     try {
-      final response = await _dio.get('${ApiEndpoints.emergencies}/$id');
-
-      if (response.statusCode == 200) {
-        return EmergencyModel.fromMap(response.data);
-      }
+      final response = await _supabase
+          .from('emergencies')
+          .select()
+          .eq('id', id)
+          .single();
+      
+      return EmergencyModel.fromMap(response);
     } catch (e) {
       rethrow;
     }
-    return null;
   }
 
   /// Updates the status of an emergency (e.g., Assigned, Arrived).
   Future<bool> updateEmergencyStatus(String id, String status) async {
     try {
-      final response = await _dio.patch('${ApiEndpoints.emergencies}/$id', data: {
+      await _supabase.from('emergencies').update({
         'status': status,
-        'updatedAt': DateTime.now().toIso8601String(),
-      });
-
-      return response.statusCode == 200;
+        'updated_at': DateTime.now().toIso8601String(),
+      }).eq('id', id);
+      return true;
     } catch (e) {
       return false;
     }
@@ -55,18 +55,16 @@ class EmergencyService {
   /// Fetches all emergencies reported by a specific user.
   Future<List<EmergencyModel>> getEmergencyHistory(String citizenId) async {
     try {
-      final response = await _dio.get(
-        ApiEndpoints.emergencies,
-        queryParameters: {'citizenId': citizenId},
-      );
+      final response = await _supabase
+          .from('emergencies')
+          .select()
+          .eq('citizen_id', citizenId)
+          .order('created_at', ascending: false);
 
-      if (response.statusCode == 200) {
-        final List data = response.data;
-        return data.map((json) => EmergencyModel.fromMap(json)).toList();
-      }
+      final List data = response as List;
+      return data.map((json) => EmergencyModel.fromMap(json)).toList();
     } catch (e) {
       return [];
     }
-    return [];
   }
 }

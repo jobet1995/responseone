@@ -11,7 +11,9 @@ import '../screens/responder/responder_request_detail.dart';
 import '../screens/admin/admin_dashboard.dart';
 import '../screens/admin/assign_responder_screen.dart';
 import '../screens/emergency/emergency_history_screen.dart';
-import '../screens/home/notifications_screen.dart';
+import '../screens/notifications/notification_center_screen.dart';
+import '../screens/emergency/feedback_screen.dart';
+import '../screens/emergency/chat_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../screens/profile/edit_profile_screen.dart';
 import '../screens/profile/emergency_contacts_screen.dart';
@@ -31,6 +33,8 @@ class AppRouteNames {
   static const String emergencyRequest = 'emergency_request';
   static const String emergencyTracking = 'emergency_tracking';
   static const String emergencyHistory = 'emergency_history';
+  static const String emergencyFeedback = 'emergency_feedback';
+  static const String emergencyChat = 'emergency_chat';
   static const String firstAid = 'first_aid';
   static const String responderDashboard = 'responder_dashboard';
   static const String requestDetail = 'request_detail';
@@ -99,6 +103,23 @@ class AppRouter {
             builder: (context, state) => const FirstAidScreen(),
           ),
           GoRoute(
+            path: 'chat/:emergencyId',
+            name: AppRouteNames.emergencyChat,
+            builder: (context, state) {
+              final id = state.pathParameters['emergencyId'] ?? '';
+              return ChatScreen(emergencyId: id);
+            },
+          ),
+          GoRoute(
+            path: 'feedback/:emergencyId/:responderId',
+            name: AppRouteNames.emergencyFeedback,
+            builder: (context, state) {
+              final id = state.pathParameters['emergencyId'] ?? '';
+              final responderId = state.pathParameters['responderId'] ?? '';
+              return FeedbackScreen(emergencyId: id, responderId: responderId);
+            },
+          ),
+          GoRoute(
             path: 'history',
             name: AppRouteNames.emergencyHistory,
             builder: (context, state) => const EmergencyHistoryScreen(),
@@ -106,7 +127,7 @@ class AppRouter {
           GoRoute(
             path: 'notifications',
             name: AppRouteNames.notifications,
-            builder: (context, state) => const NotificationsScreen(),
+            builder: (context, state) => const NotificationCenterScreen(),
           ),
         ],
       ),

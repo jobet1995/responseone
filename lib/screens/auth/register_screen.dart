@@ -5,6 +5,7 @@ import '../../providers/user_provider.dart';
 import '../../widgets/custom_button.dart';
 import '../../config/themes.dart';
 import '../../models/user_model.dart';
+import '../../utils/validators.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -19,7 +20,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   UserRole _selectedRole = UserRole.citizen;
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
@@ -27,6 +31,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     _emailController.dispose();
     _phoneController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -69,7 +74,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         elevation: 0,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppTheme.defaultPadding * 1.5),
+        padding: const EdgeInsets.symmetric(horizontal: AppTheme.defaultPadding * 1.5, vertical: 16),
         child: Form(
           key: _formKey,
           child: Column(
@@ -96,7 +101,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   prefixIcon: Icon(Icons.email_outlined),
                 ),
                 keyboardType: TextInputType.emailAddress,
-                validator: (v) => v != null && v.contains('@') ? null : 'Enter a valid email',
+                validator: AppValidators.validateEmail,
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -106,17 +111,37 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   prefixIcon: Icon(Icons.phone_outlined),
                 ),
                 keyboardType: TextInputType.phone,
-                validator: (v) => v != null && v.length >= 10 ? null : 'Invalid phone number',
+                validator: AppValidators.validatePhone,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _passwordController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Password',
-                  prefixIcon: Icon(Icons.lock_outline),
+                  prefixIcon: const Icon(Icons.lock_outline),
+                  helperText: '8+ chars, mix of A-z, 0-9, & symbols',
+                  helperMaxLines: 2,
+                  suffixIcon: IconButton(
+                    icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
+                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                  ),
                 ),
-                obscureText: true,
-                validator: (v) => v != null && v.length >= 6 ? null : 'Password (min 6 chars)',
+                obscureText: _obscurePassword,
+                validator: AppValidators.validateStrongPassword,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _confirmPasswordController,
+                decoration: InputDecoration(
+                  labelText: 'Confirm Password',
+                  prefixIcon: const Icon(Icons.lock_clock_outlined),
+                  suffixIcon: IconButton(
+                    icon: Icon(_obscureConfirmPassword ? Icons.visibility_off : Icons.visibility),
+                    onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                  ),
+                ),
+                obscureText: _obscureConfirmPassword,
+                validator: (v) => AppValidators.validateConfirmPassword(v, _passwordController.text),
               ),
               const SizedBox(height: 24),
               const Text('Select Your Role:', style: TextStyle(fontWeight: FontWeight.bold)),
