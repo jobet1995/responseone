@@ -77,6 +77,9 @@ class UserModel {
   /// Unique identifier.
   final String id;
 
+  /// Unique username for login.
+  final String username;
+
   /// Full name of the user.
   final String name;
 
@@ -106,6 +109,7 @@ class UserModel {
 
   const UserModel({
     required this.id,
+    required this.username,
     required this.name,
     required this.email,
     required this.phoneNumber,
@@ -121,6 +125,7 @@ class UserModel {
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
       id: map['id'] ?? '',
+      username: map['username'] ?? '',
       name: map['name'] ?? '',
       email: map['email'] ?? '',
       phoneNumber: map['phone_number'] ?? map['phoneNumber'] ?? '',
@@ -145,6 +150,7 @@ class UserModel {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'username': username,
       'name': name,
       'email': email,
       'phone_number': phoneNumber,
@@ -159,6 +165,7 @@ class UserModel {
 
   /// Creates a copy of the current [UserModel] with updated fields.
   UserModel copyWith({
+    String? username,
     String? name,
     String? email,
     String? phoneNumber,
@@ -170,6 +177,7 @@ class UserModel {
   }) {
     return UserModel(
       id: id,
+      username: username ?? this.username,
       name: name ?? this.name,
       email: email ?? this.email,
       phoneNumber: phoneNumber ?? this.phoneNumber,
@@ -194,6 +202,7 @@ class UserModel {
     if (identical(this, other)) return true;
     return other is UserModel &&
         other.id == id &&
+        other.username == username &&
         other.name == name &&
         other.email == email &&
         other.phoneNumber == phoneNumber &&
@@ -209,6 +218,7 @@ class UserModel {
   int get hashCode {
     return Object.hash(
       id,
+      username,
       name,
       email,
       phoneNumber,

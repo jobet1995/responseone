@@ -12,14 +12,26 @@ class EmergencyService {
   /// Reports a new emergency.
   Future<EmergencyModel?> createEmergency(Map<String, dynamic> emergencyData) async {
     try {
-      final response = await _supabase.from('emergencies').insert({
-        ...emergencyData,
+      // Ensure basic structure matches DB schema perfectly
+      final insertData = {
+        'citizen_id': emergencyData['citizen_id'],
+        'type': emergencyData['type'],
+        'status': emergencyData['status'] ?? 'Pending',
+        'description': emergencyData['description'] ?? '',
+        'location': emergencyData['location'] ?? {'latitude': 0.0, 'longitude': 0.0},
         'created_at': DateTime.now().toIso8601String(),
         'updated_at': DateTime.now().toIso8601String(),
-      }).select().single();
+      };
+
+      final response = await _supabase
+          .from('emergencies')
+          .insert(insertData)
+          .select()
+          .single();
 
       return EmergencyModel.fromMap(response);
     } catch (e) {
+      print('Emergency Insert Error: $e');
       rethrow;
     }
   }

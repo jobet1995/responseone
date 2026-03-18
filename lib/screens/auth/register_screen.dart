@@ -17,6 +17,7 @@ class RegisterScreen extends ConsumerStatefulWidget {
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -28,6 +29,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   @override
   void dispose() {
     _nameController.dispose();
+    _usernameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
     _passwordController.dispose();
@@ -40,7 +42,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     final data = {
       'name': _nameController.text,
-      'email': _emailController.text,
+      'username': _usernameController.text.trim(),
+      'email': _emailController.text.trim(),
       'phoneNumber': _phoneController.text,
       'password': _passwordController.text,
       'role': _selectedRole.value,
@@ -95,13 +98,29 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               ),
               const SizedBox(height: 16),
               TextFormField(
-                controller: _emailController,
+                controller: _usernameController,
                 decoration: const InputDecoration(
-                  labelText: 'Email Address',
-                  prefixIcon: Icon(Icons.email_outlined),
+                  labelText: 'Username',
+                  prefixIcon: Icon(Icons.alternate_email),
+                ),
+                validator: AppValidators.validateUsername,
+                onChanged: (v) {
+                  setState(() {
+                    _emailController.text = v.isNotEmpty ? '$v@resq.now' : '';
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _emailController,
+                enabled: false,
+                decoration: InputDecoration(
+                  labelText: 'Internal Auth ID (Auto-generated)',
+                  prefixIcon: const Icon(Icons.email_outlined),
+                  filled: true,
+                  fillColor: Colors.grey.withOpacity(0.1),
                 ),
                 keyboardType: TextInputType.emailAddress,
-                validator: AppValidators.validateEmail,
               ),
               const SizedBox(height: 16),
               TextFormField(

@@ -38,7 +38,6 @@ class _RequestScreenState extends ConsumerState<RequestScreen> {
       'type': _selectedType.value,
       'description': _descriptionController.text,
       'status': EmergencyStatus.pending.value,
-      'createdAt': DateTime.now().toIso8601String(),
     };
 
     final result = await ref.read(emergencyHistoryProvider.notifier).reportEmergency(data);

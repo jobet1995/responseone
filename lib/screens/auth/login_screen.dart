@@ -84,11 +84,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   TextFormField(
                     controller: _emailController,
                     decoration: const InputDecoration(
-                      labelText: 'Email Address',
-                      prefixIcon: Icon(Icons.email_outlined),
+                      labelText: 'Username',
+                      prefixIcon: Icon(Icons.alternate_email),
                     ),
-                    keyboardType: TextInputType.emailAddress,
-                    validator: AppValidators.validateEmail,
+                    validator: AppValidators.validateUsername,
                   ),
                   const SizedBox(height: 16),
                   TextFormField(

@@ -12,9 +12,12 @@ class ChatService {
   /// Sends a new message.
   Future<bool> sendMessage(MessageModel message) async {
     try {
-      await _supabase.from('messages').insert(message.toMap());
+      final data = message.toMap();
+      data.remove('id'); // Let DB generate UUID
+      await _supabase.from('messages').insert(data);
       return true;
     } catch (e) {
+      print('Chat Insert Error: $e');
       return false;
     }
   }
