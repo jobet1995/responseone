@@ -39,9 +39,9 @@ class EmergencyNotifier extends Notifier<AsyncValue<List<EmergencyModel>>> {
   }
 
   /// Reports a new emergency and adds it to the current list.
-  Future<bool> reportEmergency(Map<String, dynamic> data) async {
+  Future<EmergencyModel?> reportEmergency(Map<String, dynamic> data) async {
     final userId = _userId;
-    if (userId == null) return false;
+    if (userId == null) return null;
 
     try {
       final newEmergency = await _emergencyService.createEmergency({
@@ -53,12 +53,12 @@ class EmergencyNotifier extends Notifier<AsyncValue<List<EmergencyModel>>> {
         state.whenData((list) {
           state = AsyncValue.data([newEmergency, ...list]);
         });
-        return true;
+        return newEmergency;
       }
     } catch (e) {
       print('EmergencyNotifier Error: $e');
     }
-    return false;
+    return null;
   }
 
   /// Updates the status of an emergency in the local state.

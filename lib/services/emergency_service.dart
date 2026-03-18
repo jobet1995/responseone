@@ -79,4 +79,24 @@ class EmergencyService {
       return [];
     }
   }
+
+  /// Creates a detailed mental health crisis report linked to an emergency.
+  Future<bool> createMentalHealthReport(Map<String, dynamic> reportData) async {
+    try {
+      await _supabase.from('mental_health_reports').insert({
+        'emergency_id': reportData['emergency_id'],
+        'crisis_type': reportData['crisis_type'],
+        'risk_level': reportData['risk_level'],
+        'is_violent': reportData['is_violent'] ?? false,
+        'has_weapon': reportData['has_weapon'] ?? false,
+        'medications': reportData['medications'] ?? '',
+        'history': reportData['history'] ?? '',
+        'created_at': DateTime.now().toIso8601String(),
+      });
+      return true;
+    } catch (e) {
+      print('Mental Health Report Insert Error: $e');
+      return false;
+    }
+  }
 }

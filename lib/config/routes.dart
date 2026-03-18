@@ -21,9 +21,13 @@ import '../screens/profile/medical_profile_screen.dart';
 import '../screens/profile/emergency_contacts_screen.dart';
 import '../screens/settings/settings_screen.dart';
 import '../screens/settings/about_screen.dart';
-import '../screens/main_screen.dart';
-import '../screens/home/safety_map_screen.dart';
+import 'package:responseone/screens/main_screen.dart';
+import 'package:responseone/screens/home/safety_map_screen.dart';
 import '../screens/splash_screen.dart';
+import '../screens/emergency/mental_health_crisis_screen.dart';
+import '../screens/onboarding/onboarding_screen.dart';
+import '../screens/safety/safety_toolkit_screen.dart';
+import '../screens/safety/preparedness_screen.dart';
 import '../models/emergency_model.dart';
 
 /// Route constants for the ResQNow application.
@@ -48,6 +52,10 @@ class AppRouteNames {
   static const String assignResponder = 'assign_responder';
   static const String profile = 'profile';
   static const String editProfile = 'edit_profile';
+  static const String mentalHealthRequest = 'mental_health_request';
+  static const String onboarding = 'onboarding';
+  static const String toolkit = 'toolkit';
+  static const String preparedness = 'preparedness';
   static const String medicalProfile = 'medical_profile';
   static const String emergencyContacts = 'emergency_contacts';
   static const String settings = 'settings';
@@ -107,6 +115,11 @@ class AppRouter {
             name: AppRouteNames.profile,
             builder: (context, state) => const ProfileScreen(),
           ),
+          GoRoute(
+            path: '/toolkit',
+            name: AppRouteNames.toolkit,
+            builder: (context, state) => const SafetyToolkitScreen(),
+          ),
         ],
       ),
 
@@ -116,6 +129,9 @@ class AppRouter {
         name: AppRouteNames.emergencyRequest,
         builder: (context, state) {
           final type = state.extra as EmergencyType?;
+          if (type == EmergencyType.mentalHealth) {
+            return const MentalHealthCrisisScreen();
+          }
           return RequestScreen(initialType: type);
         },
       ),
@@ -143,6 +159,16 @@ class AppRouter {
           final responderId = state.pathParameters['responderId'] ?? '';
           return FeedbackScreen(emergencyId: id, responderId: responderId);
         },
+      ),
+      GoRoute(
+        path: '/onboarding',
+        name: AppRouteNames.onboarding,
+        builder: (context, state) => const OnboardingScreen(),
+      ),
+      GoRoute(
+        path: '/preparedness',
+        name: AppRouteNames.preparedness,
+        builder: (context, state) => const PreparednessScreen(),
       ),
       GoRoute(
         path: '/history',

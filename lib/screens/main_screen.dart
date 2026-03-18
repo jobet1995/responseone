@@ -32,9 +32,9 @@ class MainScreen extends StatelessWidget {
             label: 'Map',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.medical_services_outlined),
-            activeIcon: Icon(Icons.medical_services),
-            label: 'First Aid',
+            icon: Icon(Icons.security_outlined),
+            activeIcon: Icon(Icons.security),
+            label: 'Toolkit',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
@@ -50,7 +50,7 @@ class MainScreen extends StatelessWidget {
     final String location = GoRouterState.of(context).uri.path;
     if (location.startsWith('/home')) return 0;
     if (location.startsWith('/map')) return 1;
-    if (location.startsWith('/first-aid')) return 2;
+    if (location.startsWith('/toolkit')) return 2;
     if (location.startsWith('/profile')) return 3;
     return 0;
   }
@@ -64,7 +64,7 @@ class MainScreen extends StatelessWidget {
         context.go('/map');
         break;
       case 2:
-        context.go('/first-aid');
+        context.go('/toolkit');
         break;
       case 3:
         context.go('/profile');

@@ -44,7 +44,7 @@ class _RequestScreenState extends ConsumerState<RequestScreen> {
 
     if (mounted) {
       setState(() => _isSubmitting = false);
-      if (result) {
+      if (result != null) {
         Navigator.of(context).pop(); // Go back to home
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Emergency reported successfully! Help is on the way.')),

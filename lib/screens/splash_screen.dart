@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/user_provider.dart';
 import '../models/user_model.dart';
 import '../config/themes.dart';
@@ -45,9 +46,17 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
     }
   }
 
-  void _redirect(AsyncValue<UserModel?> userState) {
+  Future<void> _redirect(AsyncValue<UserModel?> userState) async {
     if (!mounted) return;
     
+    final prefs = await SharedPreferences.getInstance();
+    final onboardingComplete = prefs.getBool('onboarding_complete') ?? false;
+
+    if (!onboardingComplete) {
+      context.go('/onboarding');
+      return;
+    }
+
     userState.when(
       data: (user) => context.go(user != null ? '/home' : '/login'),
       loading: () {}, // Should not happen due to isLoading check

@@ -48,9 +48,18 @@ class HomeScreen extends ConsumerWidget {
                 },
               ),
               const SizedBox(height: 32),
-              const Text(
-                'Recent Emergencies',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Recent Emergencies',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  TextButton(
+                    onPressed: () => context.push('/history'),
+                    child: const Text('View All'),
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
               emergencyHistory.when(
@@ -132,7 +141,7 @@ class HomeScreen extends ConsumerWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             TextButton(
-              onPressed: () {},
+              onPressed: () => context.push('/notifications'),
               child: const Text('View All'),
             ),
           ],
@@ -149,6 +158,7 @@ class HomeScreen extends ConsumerWidget {
                 'Heavy rain expected in your area. Stay indoors.',
                 Icons.thunderstorm,
                 Colors.orange,
+                onTap: () {},
               ),
               const SizedBox(width: 12),
               _buildAlertCard(
@@ -157,6 +167,7 @@ class HomeScreen extends ConsumerWidget {
                 'Join our First Aid training this Saturday.',
                 Icons.school,
                 AppTheme.secondaryBlue,
+                onTap: () => context.push('/first-aid'),
               ),
               const SizedBox(width: 12),
               _buildAlertCard(
@@ -165,6 +176,7 @@ class HomeScreen extends ConsumerWidget {
                 'Is your emergency kit ready? Check our guide.',
                 Icons.backpack,
                 Colors.green,
+                onTap: () => context.push('/preparedness'),
               ),
             ],
           ),
@@ -173,43 +185,47 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildAlertCard(BuildContext context, String title, String desc, IconData icon, Color color) {
-    return Container(
-      width: 260,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(AppTheme.borderRadius),
-        border: Border.all(color: color.withOpacity(0.2)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(icon, color: color, size: 20),
-              const SizedBox(width: 8),
-              Text(
-                title,
-                style: TextStyle(fontWeight: FontWeight.bold, color: color),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            desc,
-            style: const TextStyle(fontSize: 14, color: AppTheme.textPrimary),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+  Widget _buildAlertCard(BuildContext context, String title, String desc, IconData icon, Color color, {VoidCallback? onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+      child: Container(
+        width: 260,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+          border: Border.all(color: color.withOpacity(0.2)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: color, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  title,
+                  style: TextStyle(fontWeight: FontWeight.bold, color: color),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              desc,
+              style: const TextStyle(fontSize: 14, color: AppTheme.textPrimary),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
     );
   }

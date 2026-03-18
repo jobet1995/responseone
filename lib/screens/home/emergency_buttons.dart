@@ -12,10 +12,10 @@ class EmergencyButtons extends StatelessWidget {
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 2,
-      mainAxisSpacing: 16,
-      crossAxisSpacing: 16,
-      childAspectRatio: 1.2,
+      crossAxisCount: 3,
+      mainAxisSpacing: 12,
+      crossAxisSpacing: 12,
+      childAspectRatio: 0.85,
       children: [
         _buildButton(
           context,
@@ -37,6 +37,13 @@ class EmergencyButtons extends StatelessWidget {
           Icons.local_police,
           Colors.blueGrey,
           EmergencyType.police,
+        ),
+        _buildButton(
+          context,
+          'Mental\nHealth',
+          Icons.psychology,
+          Colors.purple,
+          EmergencyType.mentalHealth,
         ),
         _buildButton(
           context,
