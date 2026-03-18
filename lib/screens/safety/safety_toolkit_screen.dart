@@ -142,9 +142,13 @@ class _SafetyToolkitScreenState extends State<SafetyToolkitScreen> {
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: const Text('Safety Toolkit'),
+        backgroundColor: AppTheme.primaryRed,
+        foregroundColor: Colors.white,
         elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: AppTheme.textPrimary,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppTheme.defaultPadding),
