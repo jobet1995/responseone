@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:torch_light/torch_light.dart';
+import 'package:flutter/services.dart';
 import '../../config/themes.dart';
 import '../../models/emergency_model.dart';
 
@@ -35,6 +36,28 @@ class _SafetyToolkitScreenState extends State<SafetyToolkitScreen> {
   void initState() {
     super.initState();
     _audioPlayer.setReleaseMode(ReleaseMode.loop);
+    _setupAudio();
+  }
+
+  Future<void> _setupAudio() async {
+    try {
+      await _audioPlayer.setAudioContext(AudioContext(
+        android: const AudioContextAndroid(
+          usageType: AndroidUsageType.alarm,
+          contentType: AndroidContentType.music,
+          audioFocus: AndroidAudioFocus.gainTransient,
+        ),
+        iOS: AudioContextIOS(
+          category: AVAudioSessionCategory.playback,
+          options: const {
+            AVAudioSessionOptions.defaultToSpeaker,
+            AVAudioSessionOptions.mixWithOthers,
+          },
+        ),
+      ));
+    } catch (e) {
+      debugPrint('Audio Setup Error: $e');
+    }
   }
 
   @override
@@ -50,28 +73,15 @@ class _SafetyToolkitScreenState extends State<SafetyToolkitScreen> {
       if (_isSirenActive) {
         await _audioPlayer.stop();
       } else {
-        // Set audio context for loud playback on physical devices
-        await _audioPlayer.setAudioContext(AudioContext(
-          android: const AudioContextAndroid(
-            usageType: AndroidUsageType.alarm,
-            contentType: AndroidContentType.music,
-            audioFocus: AndroidAudioFocus.gainTransient,
-          ),
-          iOS: AudioContextIOS(
-            category: AVAudioSessionCategory.playback,
-            options: const {
-              AVAudioSessionOptions.defaultToSpeaker,
-              AVAudioSessionOptions.mixWithOthers,
-            },
-          ),
-        ));
-
-        // Using a robust direct raw URL from a GitHub sample repo
-        const sirenUrl = 'https://raw.githubusercontent.com/rafaelbarbosatec/audioplayers/main/packages/audioplayers/example/assets/audio.mp3';
-        await _audioPlayer.play(UrlSource(sirenUrl));
+        // Play local asset
+        await _audioPlayer.play(AssetSource('audio/siren.mp3'));
       }
       
       setState(() => _isSirenActive = !_isSirenActive);
+      
+      if (_isSirenActive) {
+        HapticFeedback.vibrate();
+      }
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -86,7 +96,7 @@ class _SafetyToolkitScreenState extends State<SafetyToolkitScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Could not play siren. Check your internet or audio permissions.'),
+            content: Text('Could not play siren. Please check your audio permissions or device settings.'),
             backgroundColor: Colors.red,
           ),
         );
