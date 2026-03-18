@@ -66,6 +66,8 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>ResQNow needs access to your music library to play emergency alerts.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>ResQNow needs access to your photo library so you can upload a profile picture.</string>
 	<key>NSCameraUsageDescription</key>
