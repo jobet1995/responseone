@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../providers/user_provider.dart';
+import '../../models/user_model.dart';
 import '../../services/auth_service.dart';
 import '../../config/themes.dart';
 import '../../widgets/custom_button.dart';
@@ -202,32 +203,34 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 keyboardType: TextInputType.phone,
                 validator: (v) => v != null && v.isNotEmpty ? null : 'Phone number is required',
               ),
-              const SizedBox(height: 32),
-              const Divider(),
-              const SizedBox(height: 16),
-              const Text(
-                'Volunteer Program',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              SwitchListTile(
-                title: const Text('Register as Volunteer'),
-                subtitle: const Text('Get notified for nearby emergencies'),
-                value: _isVolunteer,
-                activeColor: AppTheme.primaryRed,
-                onChanged: (bool value) {
-                  setState(() => _isVolunteer = value);
-                },
-              ),
-              if (_isVolunteer) ...[
+              if (ref.watch(currentUserProvider).value?.role == UserRole.citizen) ...[
+                const SizedBox(height: 32),
+                const Divider(),
                 const SizedBox(height: 16),
-                TextFormField(
-                  controller: _skillsController,
-                  decoration: const InputDecoration(
-                    labelText: 'Skills (e.g., CPR, First Aid)',
-                    prefixIcon: Icon(Icons.psychology_outlined),
-                  ),
+                const Text(
+                  'Volunteer Program',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
+                const SizedBox(height: 8),
+                SwitchListTile(
+                  title: const Text('Register as Volunteer'),
+                  subtitle: const Text('Get notified for nearby emergencies'),
+                  value: _isVolunteer,
+                  activeColor: AppTheme.primaryRed,
+                  onChanged: (bool value) {
+                    setState(() => _isVolunteer = value);
+                  },
+                ),
+                if (_isVolunteer) ...[
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _skillsController,
+                    decoration: const InputDecoration(
+                      labelText: 'Skills (e.g., CPR, First Aid)',
+                      prefixIcon: Icon(Icons.psychology_outlined),
+                    ),
+                  ),
+                ],
               ],
               const SizedBox(height: 48),
               if (_isLoading)

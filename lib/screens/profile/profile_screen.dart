@@ -41,11 +41,15 @@ class ProfileScreen extends ConsumerWidget {
                       CircleAvatar(
                         radius: 60,
                         backgroundColor: AppTheme.primaryRed.withOpacity(0.1),
-                        backgroundImage: user.avatarUrl.isNotEmpty 
-                            ? NetworkImage(user.avatarUrl) 
+                        backgroundImage: user.avatarUrl.isNotEmpty
+                            ? NetworkImage(user.avatarUrl)
                             : null,
-                        child: user.avatarUrl.isEmpty 
-                            ? const Icon(Icons.person, size: 80, color: AppTheme.primaryRed) 
+                        child: user.avatarUrl.isEmpty
+                            ? const Icon(
+                                Icons.person,
+                                size: 80,
+                                color: AppTheme.primaryRed,
+                              )
                             : null,
                       ),
                       Positioned(
@@ -57,7 +61,11 @@ class ProfileScreen extends ConsumerWidget {
                             color: AppTheme.primaryRed,
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.edit, size: 20, color: Colors.white),
+                          child: const Icon(
+                            Icons.edit,
+                            size: 20,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ],
@@ -68,13 +76,13 @@ class ProfileScreen extends ConsumerWidget {
                   user.name,
                   style: Theme.of(context).textTheme.displaySmall,
                 ),
-                Text(
-                  user.email,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
+                Text(user.email, style: Theme.of(context).textTheme.bodyMedium),
                 const SizedBox(height: 12),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: AppTheme.secondaryBlue.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(20),
@@ -90,7 +98,12 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 40),
                 _buildInfoCard(context, [
-                  _buildInfoTile(context, Icons.phone_outlined, 'Phone', user.phoneNumber),
+                  _buildInfoTile(
+                    context,
+                    Icons.phone_outlined,
+                    'Phone',
+                    user.phoneNumber,
+                  ),
                   _buildInfoTile(
                     context,
                     Icons.medical_services_outlined,
@@ -105,10 +118,13 @@ class ProfileScreen extends ConsumerWidget {
                     'Trusted contacts',
                     onTap: () => context.push('/profile/contacts'),
                   ),
-                  _buildInfoTile(context, Icons.calendar_today_outlined, 'Member Since', 'March 2026'),
+                  _buildInfoTile(
+                    context,
+                    Icons.calendar_today_outlined,
+                    'Member Since',
+                    'March 2026',
+                  ),
                 ]),
-                const SizedBox(height: 24),
-                _buildVolunteerSection(context, ref, user),
                 const SizedBox(height: 16),
                 CustomButton(
                   text: 'LOGOUT',
@@ -148,69 +164,36 @@ class ProfileScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(AppTheme.borderRadius),
         side: BorderSide(color: Colors.grey.withOpacity(0.2)),
       ),
-      child: Column(
-        children: children,
-      ),
+      child: Column(children: children),
     );
   }
 
-  Widget _buildInfoTile(BuildContext context, IconData icon, String label, String value, {VoidCallback? onTap}) {
+  Widget _buildInfoTile(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String value, {
+    VoidCallback? onTap,
+  }) {
     return ListTile(
       leading: Icon(icon, color: AppTheme.textSecondary),
-      title: Text(label, style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
-      subtitle: Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
-      trailing: onTap != null ? const Icon(Icons.chevron_right, size: 20) : null,
-      onTap: onTap,
-      dense: true,
-    );
-  }
-
-  Widget _buildVolunteerSection(BuildContext context, WidgetRef ref, dynamic user) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppTheme.borderRadius),
-        side: const BorderSide(color: AppTheme.secondaryBlue, width: 1),
+      title: Text(
+        label,
+        style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.volunteer_activism_outlined, color: AppTheme.secondaryBlue),
-                const SizedBox(width: 8),
-                const Text(
-                  'Volunteer Mode',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.secondaryBlue),
-                ),
-                const Spacer(),
-                Switch(
-                  value: user.isVolunteer,
-                  onChanged: (v) {
-                    // Update volunteer status
-                    ref.read(currentUserProvider.notifier).updateUser(user.copyWith(isVolunteer: v));
-                  },
-                  activeColor: AppTheme.secondaryBlue,
-                ),
-              ],
-            ),
-            if (user.isVolunteer) ...[
-              const Divider(),
-              const Text(
-                'Help your community! You will be notified of nearby emergencies where you can provide basic assistance.',
-                style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Skills: ${user.skills.isEmpty ? "None added" : user.skills}',
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-              ),
-            ],
-          ],
+      subtitle: Text(
+        value,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          color: AppTheme.textPrimary,
         ),
       ),
+      trailing: onTap != null
+          ? const Icon(Icons.chevron_right, size: 20)
+          : null,
+      onTap: onTap,
+      dense: true,
     );
   }
 }

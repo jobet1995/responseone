@@ -50,7 +50,7 @@ class PreparednessScreen extends StatelessWidget {
             subtitle: 'Protect your home and family from rising water.',
             icon: Icons.water_drop_rounded,
             color: Colors.blue,
-            progress: 0.3,
+            progress: 0.0,
             categoryId: 'flood',
           ),
           _buildChecklistTile(
